@@ -29,6 +29,16 @@ generate_masks()
 
 #-------------------------------------------------------------------------------
 
+def complete_search(mover_pieces, opponent_pieces, empty_squares):
+
+    vertical_legal_moves = vertical_search(mover_pieces, opponent_pieces, empty_squares)
+    horizontal_legal_moves = horizontal_search(mover_pieces, opponent_pieces, empty_squares)
+    diagonal_legal_moves = diagonal_search(mover_pieces, opponent_pieces, empty_squares)
+
+    legal_moves = bitboard_handler.bitwise([vertical_legal_moves,horizontal_legal_moves, diagonal_legal_moves], "or", True)
+
+    return legal_moves
+
 def general_search(mover_pieces, opponent_pieces, empty_squares, step):
 
     legal_moves = bitboard_handler.empty_bitboard()

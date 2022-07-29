@@ -3,6 +3,7 @@ import numpy as np
 from src.environment.config import *
 import src.environment.bitboard as bitboard_handler
 import src.environment.legal_moves_generator as moves_generator
+import src.environment.reverter as reverter
 
 class Board:
 
@@ -44,11 +45,7 @@ class Board:
         mover_pieces = self.white_pieces if self.turn else self.black_pieces
         opponent_pieces = self.black_pieces if self.turn else self.white_pieces
 
-        vertical_legal_moves = moves_generator.vertical_search(mover_pieces, opponent_pieces, self.empty_squares)
-        horizontal_legal_moves = moves_generator.horizontal_search(mover_pieces, opponent_pieces, self.empty_squares)
-        diagonal_legal_moves = moves_generator.diagonal_search(mover_pieces, opponent_pieces, self.empty_squares)
-
-        legal_moves = bitboard_handler.bitwise([vertical_legal_moves,horizontal_legal_moves, diagonal_legal_moves], "or", True)
+        legal_moves = moves_generator.complete_search(mover_pieces, opponent_pieces, self.empty_squares)
 
         return bitboard_handler.bitboard_to_numpy_array(legal_moves)
 
@@ -70,7 +67,7 @@ class Board:
             else:
                 return -1
 
-    def get_state():
+    def get_state(self):
 
         white_pieces = bitboard_handler.bitboard_to_numpy_matrix(self.white_pieces)
         black_pieces = bitboard_handler.bitboard_to_numpy_matrix(self.black_pieces)
@@ -78,11 +75,34 @@ class Board:
 
         return white_pieces, black_pieces, turn, self.legal_moves, self.reward
 
-    def move(move_number):
+    def move(self, move_number):
 
-        if move_number not in self.legal_moves.tolist():
+        legal_moves_mask = self.legal_moves.tolist()
+        if legal_moves_mask[move_number]==0:
             raise "Invalid move!"
 
-        #TODO: add piece
-        #TODO: revert pieces in between
-        #TODO: create and return new state
+        move_bitboard = "0b" + "0"*move_number + "1" + "0"*(BOARD_SIZE*BOARD_SIZE - move_number - 1)
+
+        #Add piece
+        mover_pieces = self.white_pieces if self.turn else self.black_pieces
+        opponent_pieces = self.black_pieces if self.turn else self.white_pieces
+        mover_pieces = bitboard_handler.bitwise([mover_pieces, move_bitboard], "or")
+
+        #Revert pieces in between
+        reverted_pieces = reverter.complete_search(mover_pieces, opponent_pieces, move_bitboard)
+        mover_pieces = bitboard_handler.bitwise([mover_pieces, reverted_pieces], "or", True)
+        opponent_pieces = bitboard_handler.bitwise([opponent_pieces, reverted_pieces], "xor", True)
+
+        #Create and return new state
+        if self.turn:
+            white_pieces = mover_pieces
+            black_pieces = opponent_pieces
+            turn = False
+        else:
+            white_pieces = opponent_pieces
+            black_pieces = mover_pieces
+            turn = True
+
+        new_board = Board(white_pieces, black_pieces, turn)
+
+        return new_board

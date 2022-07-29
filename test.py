@@ -5,8 +5,6 @@ import src.environment.legal_moves_generator as moves_generator
 import time
 
 board = Board()
-a = bitboard_handler.bitboard_to_numpy_matrix("0b1011001011010101")
-print(a)
-
-#start_time = time.time()
-#print("--- %s seconds ---" % (time.time() - start_time))
+start_time = time.time()
+board = board.move(20)
+print("--- %s seconds ---" % (time.time() - start_time))
