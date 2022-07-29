@@ -2,8 +2,8 @@ import numpy as np
 
 from src.environment.config import *
 import src.environment.bitboard as bitboard_handler
-import src.environment.legal_moves_generator as moves_generator
-import src.environment.reverter as reverter
+import src.environment.rules.legal_moves_generator as moves_generator
+import src.environment.rules.reverter as reverter
 
 class Board:
 

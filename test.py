@@ -1,6 +1,6 @@
 from src.environment.board import Board
 import src.environment.bitboard as bitboard_handler
-import src.environment.legal_moves_generator as moves_generator
+import src.environment.rules.legal_moves_generator as moves_generator
 
 import time
 

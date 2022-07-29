@@ -1,6 +1,6 @@
 from src.environment.config import *
 import src.environment.bitboard as bitboard_handler
-from src.environment.legal_moves_generator import masks_bottom_up, masks_top_down
+from src.environment.rules.legal_moves_generator import masks_bottom_up, masks_top_down
 
 def complete_search(mover_pieces, opponent_pieces, selected_move):
 
