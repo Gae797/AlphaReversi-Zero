@@ -9,7 +9,7 @@ class RandomAgent(AgentInterface):
         if seed is not None:
             random.seed(seed)
 
-    def play(self, board, time):
+    def play(self, board, timer):
 
         legal_moves = board.legal_moves["indices"]
         move = random.choice(legal_moves)
