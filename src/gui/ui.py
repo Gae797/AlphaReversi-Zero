@@ -1,5 +1,3 @@
-import tkinter as tk
-import numpy as np
 from PIL import Image, ImageDraw, ImageTk
 
 from src.environment.board import Board
@@ -66,25 +64,3 @@ class UI:
     def save_image(self):
 
         self.image.save('test.jpg', quality=100)
-
-class Window:
-
-    def __init__(self, draw_legal_moves=False):
-
-        self.ui = UI(draw_legal_moves)
-
-        self.root = tk.Tk()
-        self.root.title("Board")
-
-        self.canvas = tk.Canvas(self.root,width=SIDE,height=SIDE)
-        self.canvas.pack()
-
-    def update(self, board):
-
-        self.ui.update_pieces(board)
-
-        image = ImageTk.PhotoImage(self.ui.image)
-        self.canvas.delete("all")
-        sprite = self.canvas.create_image(SIDE//2,SIDE//2,image=image)
-
-        self.root.update()
