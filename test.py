@@ -4,11 +4,13 @@ import src.environment.bitboard as bitboard_handler
 import src.environment.rules.legal_moves_generator as moves_generator
 from src.game import Game
 from src.agents.random_agent import RandomAgent
+from src.agents.greedy_network_agent import GreedyNetworkAgent
+from src.environment.config import *
 
 import time
 
 white_agent = RandomAgent()
-black_agent = RandomAgent()
+black_agent = GreedyNetworkAgent(BOARD_SIZE, 9)
 game = Game(white_agent, black_agent)
 
 game.play()
