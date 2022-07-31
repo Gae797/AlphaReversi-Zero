@@ -40,8 +40,6 @@ class AlphaReversiNetwork(tf.keras.Model):
 
 def build_model(board_size, n_residual_blocks, verbose=True):
 
-    #TODO: add loss and metrics
-
     n_squares = board_size*board_size
 
     board_inputs = tf.keras.Input(shape=(board_size, board_size, 3), name="board state")
@@ -51,8 +49,6 @@ def build_model(board_size, n_residual_blocks, verbose=True):
 
     model = AlphaReversiNetwork(n_squares, n_residual_blocks)
     model(inputs)
-
-    #model.compile(optimizer, loss, metrics=metrics)
 
     if verbose:
         model.summary()
