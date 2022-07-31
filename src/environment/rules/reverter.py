@@ -29,6 +29,8 @@ def general_search(mover_pieces, opponent_pieces, selected_move, step):
             else:
                 return 0
 
+    return 0
+
 def general_diagonal_search(mover_pieces, opponent_pieces, selected_move, diagonal_mask, up, right):
 
     masked_selected_move = bitboard_handler.bitwise([selected_move, diagonal_mask], "and")
