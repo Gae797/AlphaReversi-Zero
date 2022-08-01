@@ -3,6 +3,8 @@ import numpy as np
 from src.rl.mcts.node import Node
 from src.rl.mcts.prediction_queue import PredictionQueue
 
+from src.rl.config import *
+
 class MonteCarloTS():
 
     def __init__(self, root_node, prediction_queue, n_iterations):
@@ -56,7 +58,7 @@ class MonteCarloTS():
 
         search_policy = []
         for child_node, prior_prob in zip(actions, probabilities):
-            uct = prior_prob * parent_node.visit_count / (child_node.visit_count+1)
+            uct = CPUCT * prior_prob * parent_node.visit_count / (child_node.visit_count+1)
             node_value = child_node.average_outcome if parent_node.board.turn else -child_node.average_outcome
             search_policy.append(uct + node_value)
 

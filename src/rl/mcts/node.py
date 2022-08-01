@@ -18,6 +18,8 @@ class Node:
         self.children = None #actions
         self.parent = parent
 
+        self.search_policy = None
+
     def set_estimation(self, prediction):
 
         global_policy = prediction[0]
