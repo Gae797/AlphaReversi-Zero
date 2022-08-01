@@ -41,9 +41,9 @@ class TrainingQueue:
 
         x_train, y_train = self.split_samples(samples)
 
-        self.model.fit(x_train, y_train_ batch_size=BATCH_SIZE, epoch=1)
+        self.model.fit(x_train, y_train_ batch_size=BATCH_SIZE, epochs=1)
 
-    def train(self, epochs):
+    def train(self, steps):
 
-        for i in range(epochs):
+        for i in range(steps):
             self.run_train_step()

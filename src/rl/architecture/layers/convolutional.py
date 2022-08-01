@@ -15,7 +15,8 @@ class ConvolutionalBlock(layers.Layer):
                                                 strides=1,
                                                 padding="same",
                                                 activation=None,
-                                                use_bias=True)
+                                                use_bias=True,
+                                                kernel_regularizer=L2_REGULARIZER)
 
         self.batch_norm_layer = layers.BatchNormalization()
 

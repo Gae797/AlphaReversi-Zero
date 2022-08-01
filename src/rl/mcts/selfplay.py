@@ -49,11 +49,13 @@ class SelfPlay:
 
             white_pieces, black_pieces, turn, legal_moves, reward = node.board.get_state(legal_moves_format="indices")
             board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
+            masked_legal_moves = node.board.legal_moves["array"]
 
             search_policy = np.zeros(BOARD_SIZE*BOARD_SIZE)
             for index, value in zip(legal_moves, node.search_policy):
                 search_policy[index] = value
 
+            inputs = [board_inputs, masked_legal_moves]
             outputs = [search_policy, self.outcome]
 
             samples.append([board_inputs, outputs])

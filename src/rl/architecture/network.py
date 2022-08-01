@@ -38,6 +38,27 @@ class AlphaReversiNetwork(tf.keras.Model):
 
         return [policy, value]
 
+    def train_step(self, data):
+
+        x, y = data
+        policy_true = y[0]
+        value_true = y[1]
+
+        with tf.GradientTape() as tape:
+            predictions = self(x, training=True)
+            policy_pred = predictions[0]
+            value_pred = predictions[1]
+
+            value_loss = tf.math.square(value_true - value_pred)
+            policy_loss =  - tf.math.reduce_sum(policy_true * tf.math.log(policy_pred))
+            loss = value_loss + policy_loss + self.losses
+
+        grads = tape.gradient(loss, self.trainable_weights)
+        self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
+
+        #TODO: return metrics?
+        return None
+
 def build_model(board_size, n_residual_blocks, verbose=True):
 
     n_squares = board_size*board_size
@@ -52,5 +73,7 @@ def build_model(board_size, n_residual_blocks, verbose=True):
 
     if verbose:
         model.summary()
+
+    model.compile(optimizer=OPTIMIZER)
 
     return model
