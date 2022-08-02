@@ -12,7 +12,7 @@ class PredictionQueue:
         self.queue = queue.Queue()
         self.collected_nodes = []
 
-        self.run = False+
+        self.run = False
         self.timer = 0.0
 
         self.n_parallel_calls = n_parallel_calls
