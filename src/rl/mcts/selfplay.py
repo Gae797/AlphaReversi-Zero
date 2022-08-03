@@ -35,6 +35,7 @@ class SelfPlay:
         while(not self.current_node.board.is_terminal):
             self.play_move()
             self.n_played_moves += 1
+            print(self.n_played_moves)
             self.update_temperature()
 
         self.outcome = self.current_node.board.reward
@@ -58,7 +59,7 @@ class SelfPlay:
             inputs = [board_inputs, masked_legal_moves]
             outputs = [search_policy, self.outcome]
 
-            samples.append([board_inputs, outputs])
+            samples.append([inputs, outputs])
 
         self.training_queue.add_samples(samples)
 
@@ -66,7 +67,7 @@ class SelfPlay:
 
         if self.n_played_moves > N_MOVES_HIGHEST_TEMPERATURE:
             decreasing_factor = self.n_played_moves - N_MOVES_HIGHEST_TEMPERATURE + 1
-            self.temperature = 1.0 / pow(decreasing_factor, 2)
+            self.temperature = 1.0 / decreasing_factor
 
     def get_search_policy(self, node, temperature=None):
 

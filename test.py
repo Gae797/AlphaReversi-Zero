@@ -6,14 +6,20 @@ from src.game import Game
 from src.agents.random_agent import RandomAgent
 from src.agents.greedy_network_agent import GreedyNetworkAgent
 from src.environment.config import *
+from src.rl.training.trainer import Trainer
 
 import time
 
-white_agent = RandomAgent()
-black_agent = GreedyNetworkAgent(BOARD_SIZE, 9)
-game = Game(white_agent, black_agent)
+trainer = Trainer()
+start_time = time.time()
+trainer.run()
+print("--- %s seconds ---" % (time.time() - start_time))
 
-game.play()
+#white_agent = RandomAgent()
+#black_agent = GreedyNetworkAgent(BOARD_SIZE, 9)
+#game = Game(white_agent, black_agent)
+
+#game.play()
 
 #start_time = time.time()
 #print("--- %s seconds ---" % (time.time() - start_time))

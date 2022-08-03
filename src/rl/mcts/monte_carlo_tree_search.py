@@ -13,10 +13,10 @@ class MonteCarloTS():
         self.prediction_queue = prediction_queue
         self.n_iterations = n_iterations
 
-        if not self.root.is_expanded:
+        if not self.root.is_expanded():
             self.root.expand()
 
-        if not self.root.is_evaluated:
+        if not self.root.is_evaluated():
             self.evaluate(self.root)
             self.backup(self.root)
 
@@ -31,7 +31,7 @@ class MonteCarloTS():
 
         selected_node = self.select(self.root)
 
-        if not selected_node.is_evaluated:
+        if not selected_node.is_evaluated():
             self.evaluate(selected_node)
 
         self.backup(selected_node)
@@ -42,7 +42,7 @@ class MonteCarloTS():
             return node
 
         else:
-            if not node.is_expanded:
+            if not node.is_expanded():
                 node.expand()
 
             select_policy = self.select_policy(node)
@@ -66,8 +66,8 @@ class MonteCarloTS():
 
     def evaluate(self, node):
 
-        prediction_queue.add_node(node)
-        while(not node.is_evaluated):
+        self.prediction_queue.add_node(node)
+        while(not node.is_evaluated()):
             pass
 
     def backup(self, node):

@@ -39,8 +39,6 @@ class PolicyHead(layers.Layer):
         x = self.flatten_layer(x)
         prob = self.dense_layer(x)
 
-        prob = self.softmax_layer(prob)
-        masked_prob = prob * legal_moves
-        policy = self.softmax_layer(masked_prob)
+        policy = self.softmax_layer(prob, mask=legal_moves)
 
         return policy

@@ -24,17 +24,33 @@ class TrainingQueue:
 
         return samples
 
-    def split_samples(self, samples):
+    def unpack_samples(self, samples):
 
         x_train = []
         y_train = []
 
-        for sample in samples:
-            x_train.append(sample[0])
-            y_train.append(sample[1])
+        board_inputs_batched = []
+        legal_moves_batched = []
+        policy_outputs_batched = []
+        value_outputs_batched = []
 
-        x_train = np.array(x_train)
-        y_train = np.array(y_train)
+        for sample in samples:
+            inputs = sample[0]
+            outputs = sample[1]
+
+            board_inputs_batched.append(inputs[0])
+            legal_moves_batched.append(inputs[1])
+
+            policy_outputs_batched.append(outputs[0])
+            value_outputs_batched.append(outputs[1])
+
+        board_inputs_batched = np.array(board_inputs_batched)
+        legal_moves_batched = np.array(legal_moves_batched)
+        policy_outputs_batched = np.array(policy_outputs_batched)
+        value_outputs_batched = np.array(value_outputs_batched)
+
+        x_train = [board_inputs_batched, legal_moves_batched]
+        y_train = [policy_outputs_batched, value_outputs_batched]
 
         return x_train, y_train
 
@@ -42,9 +58,9 @@ class TrainingQueue:
 
         samples = self.sample_queue()
 
-        x_train, y_train = self.split_samples(samples)
+        x_train, y_train = self.unpack_samples(samples)
 
-        self.model.fit(x_train, y_train_ batch_size=BATCH_SIZE, epochs=EPOCHS_PER_STEP)
+        self.model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=EPOCHS_PER_STEP)
 
     def train(self, steps):
 
