@@ -2,10 +2,10 @@ import tensorflow as tf
 
 class LRSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
 
-  def __init__(self, initial_learning_rate, decreasing_steps):
+  def __init__(self, initial_learning_rate, initial_current_step, decreasing_steps):
 
     self.learning_rate = initial_learning_rate
-    self.current_step = 0
+    self.current_step = initial_current_step
 
   def __call__(self, step):
 

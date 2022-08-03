@@ -21,13 +21,12 @@ GOAL_GENERATION = 20
 
 STARTING_LEARNING_RATE = 0.1
 LR_DECREASING_STEPS = [] #To be set
-lr_schedule = LRSchedule(STARTING_LEARNING_RATE, LR_DECREASING_STEPS)
+lr_schedule = LRSchedule(STARTING_LEARNING_RATE, 0, LR_DECREASING_STEPS) #TODO: load previous current step and lr
 OPTIMIZER = tf.keras.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9, name="SGD")
 
 #Remainder:
-#TODO: Trainer
 #TODO: test extensively
-#TODO: save/load weights and training queue and current generation
+#TODO: save/load weights and training queue and current generation and current step and current learning rate
 #TODO: Dir noise
 #TODO: Resignation
 #TODO: simmetries

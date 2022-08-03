@@ -33,6 +33,9 @@ class TrainingQueue:
             x_train.append(sample[0])
             y_train.append(sample[1])
 
+        x_train = np.array(x_train)
+        y_train = np.array(y_train)
+
         return x_train, y_train
 
     def run_train_step(self):

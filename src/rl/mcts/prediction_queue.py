@@ -36,6 +36,10 @@ class PredictionQueue:
 
         self.queue.put(node)
 
+    def remove_worker(self):
+
+        self.n_parallel_calls -= 1
+
     def run_execution(self):
 
         while(self.run):
@@ -59,20 +63,17 @@ class PredictionQueue:
 
     def evaluate_nodes(self):
 
-        board_inputs_batch = []
-        legal_moves_inputs_batch = []
+        inputs = []
         for node in self.collect_nodes:
             white_pieces, black_pieces, turn, legal_moves, reward = node.board.get_state()
 
             board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
 
-            board_inputs_batch.append(board_inputs)
-            legal_moves_inputs_batch.append(legal_moves_inputs)
+            inputs.append([board_inputs, legal_moves_inputs])
 
-        board_inputs_batch = np.array(board_inputs_batch)
-        legal_moves_inputs_batch = np.array(legal_moves_inputs_batch)
+        inputs = np.array(inputs)
 
-        predictions = self.model.predict([board_inputs_batch, legal_moves_inputs_batch], batch_size=self.n_parallel_calls)
+        predictions = self.model.predict(inputs, batch_size=self.n_parallel_calls)
 
         for i, node in enumerate(self.collected_nodes):
             prediction = predictions[i]

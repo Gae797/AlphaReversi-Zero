@@ -31,9 +31,9 @@ class Trainer:
     def run_selfplay_session(self):
 
         threads = [Thread(self.play_games) for _ in range(WORKERS)]
-        prediction_thread = Thread(self.prediction_queue.run_execution)
 
         self.prediction_queue.start()
+        prediction_thread = Thread(self.prediction_queue.run_execution)
         prediction_thread.start()
 
         for thread in threads:
@@ -56,3 +56,5 @@ class Trainer:
         for i in range(n_games):
             selfplay = SelfPlay(self.prediction_queue, self.training_queue, MCTS_ITERATIONS)
             selfplay.simulate_game()
+
+        self.prediction_queue.remove_worker()

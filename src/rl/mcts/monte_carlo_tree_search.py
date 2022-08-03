@@ -45,24 +45,24 @@ class MonteCarloTS():
             if not node.is_expanded:
                 node.expand()
 
-            search_policy = self.search_policy(node)
-            selected_action = np.argmax(search_policy)
+            select_policy = self.select_policy(node)
+            selected_action = np.argmax(select_policy)
             selected_node = node.children[selected_action]
 
             return self.select(selected_node)
 
-    def search_policy(self, parent_node):
+    def select_policy(self, parent_node):
 
         probabilities = parent_node.estimated_policy
         actions = parent_node.children
 
-        search_policy = []
+        select_policy = []
         for child_node, prior_prob in zip(actions, probabilities):
             uct = CPUCT * prior_prob * parent_node.visit_count / (child_node.visit_count+1)
             node_value = child_node.average_outcome if parent_node.board.turn else -child_node.average_outcome
-            search_policy.append(uct + node_value)
+            select_policy.append(uct + node_value)
 
-        return search_policy
+        return select_policy
 
     def evaluate(self, node):
 

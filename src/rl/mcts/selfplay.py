@@ -65,23 +65,35 @@ class SelfPlay:
     def update_temperature(self):
 
         if self.n_played_moves > N_MOVES_HIGHEST_TEMPERATURE:
-            decreasing_factor = self.n_played_moves - N_MOVES_HIGHEST_TEMPERATURE
+            decreasing_factor = self.n_played_moves - N_MOVES_HIGHEST_TEMPERATURE + 1
             self.temperature = 1.0 / pow(decreasing_factor, 2)
+
+    def get_search_policy(self, node, temperature=None):
+
+        if temperature is None:
+            visits = [child.visit_count for child in node.children]
+
+        else:
+            exponent = 1.0/self.temperature
+            visits = [pow(child.visit_count,exponent) for child in node.children]
+
+        tot = float(sum(visits))
+        search_policy = [visit/tot for visit in visits]
+
+        return search_policy
 
     def play_move(self):
 
         mcts = MonteCarloTS(self.current_node, self.prediction_queue, self.n_iterations)
         mcts.run_search()
 
-        self.current_node.search_policy = mcts.search_policy(self.current_node)
+        self.current_node.search_policy = self.get_search_policy(self.current_node)
 
-        exponent = 1.0/self.temperature
-        visits = [pow(node.visit_count,exponent) for node in self.current_node.children]
-        tot = sum(visits)
-        visits = [visit/tot for visit in visits]
+        simulation_policy = self.get_search_policy(self.current_node, self.temperature)
 
-        move = random.choices(self.current_node.children, visits)[0]
+        move = random.choices(self.current_node.children, weights=simulation_policy)[0]
 
         #TODO: add multiple nodes each time
         self.encountered_nodes.append(self.current_node)
         self.current_node = move
+        self.current_node.parent = None

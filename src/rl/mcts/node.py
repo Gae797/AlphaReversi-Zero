@@ -25,18 +25,20 @@ class Node:
         global_policy = prediction[0]
         self.estimated_policy = np.where(global_policy>0)[0].tolist()
 
+        assert len(self.estimated_policy)==len(self.board.legal_moves[indices])
+
         self.estimated_value = prediction[1]
 
     def expand(self):
 
         self.children = []
 
-        legal_moves = board.legal_moves["indices"]
+        legal_moves = self.board.legal_moves["indices"]
 
         for action in legal_moves:
             new_board = self.board.move(action)
             child = Node(new_board, self)
-            children.append((child,action))
+            children.append(child)
 
     def backup_update(self, value):
 
