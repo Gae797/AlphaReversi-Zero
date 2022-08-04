@@ -22,12 +22,12 @@ class Node:
 
     def set_estimation(self, prediction):
 
-        global_policy = prediction[0]
+        global_policy = np.array(prediction[0])
         self.estimated_policy = global_policy[np.nonzero(global_policy)]
 
         assert len(self.estimated_policy)==len(self.board.legal_moves["indices"])
 
-        self.estimated_value = prediction[1]
+        self.estimated_value = prediction[1][0]
 
     def expand(self):
 

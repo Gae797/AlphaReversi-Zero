@@ -1,17 +1,22 @@
 import numpy as np
+import multiprocessing
 
 from src.rl.mcts.node import Node
 from src.rl.mcts.prediction_queue import PredictionQueue
 
 from src.rl.config import *
 
+import time
+
 class MonteCarloTS():
 
-    def __init__(self, root_node, prediction_queue, n_iterations):
+    def __init__(self, root_node, prediction_queue, prediction_dict, n_iterations, thread_number):
 
         self.root = root_node
         self.prediction_queue = prediction_queue
+        self.prediction_dict = prediction_dict
         self.n_iterations = n_iterations
+        self.thread_number = thread_number
 
         if not self.root.is_expanded():
             self.root.expand()
@@ -66,9 +71,15 @@ class MonteCarloTS():
 
     def evaluate(self, node):
 
-        self.prediction_queue.add_node(node)
-        while(not node.is_evaluated()):
-            pass
+        #node.estimated_value=0.1
+        #node.estimated_policy=np.zeros(len(node.board.legal_moves["indices"])).tolist()
+        #return
+
+        pack = (node.board, self.thread_number)
+        self.prediction_queue.put(pack)
+
+        prediction = self.prediction_dict[self.thread_number].get()
+        node.set_estimation(prediction)
 
     def backup(self, node):
 

@@ -10,16 +10,17 @@ from src.rl.training.trainer import Trainer
 
 import time
 
-trainer = Trainer()
-start_time = time.time()
-trainer.run()
-print("--- %s seconds ---" % (time.time() - start_time))
+if __name__ == '__main__':
+    trainer = Trainer()
+    start_time = time.time()
+    trainer.run()
+    print("--- %s seconds ---" % (time.time() - start_time))
 
-#white_agent = RandomAgent()
-#black_agent = GreedyNetworkAgent(BOARD_SIZE, 9)
-#game = Game(white_agent, black_agent)
+    #white_agent = RandomAgent()
+    #black_agent = GreedyNetworkAgent(BOARD_SIZE, 9)
+    #game = Game(white_agent, black_agent)
 
-#game.play()
+    #game.play()
 
-#start_time = time.time()
-#print("--- %s seconds ---" % (time.time() - start_time))
+    #start_time = time.time()
+    #print("--- %s seconds ---" % (time.time() - start_time))

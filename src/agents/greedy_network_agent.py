@@ -18,8 +18,9 @@ class GreedyNetworkAgent(AgentInterface):
 
         board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
         batched_board_inputs = np.expand_dims(board_inputs, axis=0)
+        batched_legal_moves = np.expand_dims(legal_moves, axis=0)
 
-        policy, value = self.model([batched_board_inputs, legal_moves])
+        policy, value = self.model([batched_board_inputs, batched_legal_moves], training=False)
 
         move = np.argmax(policy)
 

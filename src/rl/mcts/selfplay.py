@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from collections import deque
 
 from src.rl.mcts.monte_carlo_tree_search import MonteCarloTS
 from src.rl.mcts.node import Node
@@ -12,11 +13,13 @@ from src.environment.config import BOARD_SIZE
 
 class SelfPlay:
 
-    def __init__(self, prediction_queue, training_queue, n_iterations):
+    def __init__(self, prediction_queue, training_queue, prediction_dict, n_iterations, thread_number):
 
         self.prediction_queue = prediction_queue
         self.training_queue = training_queue
+        self.prediction_dict = prediction_dict
         self.n_iterations = n_iterations
+        self.thread_number = thread_number
 
         self.current_node = None
         self.temperature = 1.0
@@ -61,7 +64,7 @@ class SelfPlay:
 
             samples.append([inputs, outputs])
 
-        self.training_queue.add_samples(samples)
+        self.training_queue.extend(samples)
 
     def update_temperature(self):
 
@@ -85,7 +88,7 @@ class SelfPlay:
 
     def play_move(self):
 
-        mcts = MonteCarloTS(self.current_node, self.prediction_queue, self.n_iterations)
+        mcts = MonteCarloTS(self.current_node, self.prediction_queue, self.prediction_dict, self.n_iterations, self.thread_number)
         mcts.run_search()
 
         self.current_node.search_policy = self.get_search_policy(self.current_node)

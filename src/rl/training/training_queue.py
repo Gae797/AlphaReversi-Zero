@@ -8,14 +8,10 @@ from src.rl.config import *
 
 class TrainingQueue:
 
-    def __init__(self, model, size):
+    def __init__(self, model, queue):
 
         self.model = model
-        self.queue = deque(maxlen=size)
-
-    def add_samples(self, samples):
-
-        self.queue.extend(samples)
+        self.queue = queue
 
     def sample_queue(self):
 

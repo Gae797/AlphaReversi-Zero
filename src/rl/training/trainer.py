@@ -1,4 +1,5 @@
-import threading
+from multiprocessing import Process, Queue
+from collections import deque
 
 from src.rl.training.training_queue import TrainingQueue
 from src.rl.mcts.prediction_queue import PredictionQueue
@@ -8,48 +9,42 @@ import src.rl.architecture.network as network
 from src.rl.config import *
 from src.environment.config import BOARD_SIZE
 
-class SelfPlayThread(threading.Thread):
+class SelfPlayThread():
 
-    def __init__(self, prediction_queue, training_queue, *args, **kwargs):
+    def __init__(self, prediction_queue, workers_queue, training_queue, prediction_dict, thread_number):
 
-        super(SelfPlayThread,self).__init__(*args, **kwargs)
-        self.prediction_queue = prediction_queue
-        self.training_queue = training_queue
+        process_kwargs = {"prediction_queue":prediction_queue,
+                        "workers_queue":workers_queue,
+                        "training_queue":training_queue,
+                        "prediction_dict":prediction_dict,
+                        "thread_number": thread_number}
 
-    def play_games(self):
+        self.process = Process(target=self.play_games, kwargs=process_kwargs)
 
-        self.prediction_queue.add_worker()
+    def play_games(self, prediction_queue, workers_queue, training_queue, prediction_dict, thread_number):
+
+        workers_queue.put(thread_number)
 
         n_games = N_GAMES_BEFORE_TRAINING // WORKERS
+        completed_games = 0
 
         for i in range(n_games):
-            selfplay = SelfPlay(self.prediction_queue, self.training_queue, MCTS_ITERATIONS)
+            selfplay = SelfPlay(prediction_queue, training_queue, prediction_dict, MCTS_ITERATIONS, thread_number)
             selfplay.simulate_game()
+            completed_games += 1
+            print("Thread_{} has completed its game number {}".format(thread_number,completed_games))
 
-        self.prediction_queue.remove_worker()
-
-    def run(self):
-
-        self.play_games()
-
-class PredictionQueueThread(threading.Thread):
-
-    def __init__(self, prediction_queue, *args, **kwargs):
-
-        super(PredictionQueueThread,self).__init__(*args, **kwargs)
-        self.prediction_queue = prediction_queue
-
-    def run(self):
-
-        self.prediction_queue.run_execution()
+        workers_queue.get()
 
 class Trainer:
 
     def __init__(self):
 
+        prediction_dict = {i+1:Queue(1) for i in range(WORKERS)}
+
         self.model = network.build_model(BOARD_SIZE, N_RESIDUAL_BLOCKS)
-        self.training_queue = TrainingQueue(self.model, TRAINING_QUEUE_LEN)
-        self.prediction_queue = PredictionQueue(self.model, 2)
+        self.training_queue = TrainingQueue(self.model, deque(maxlen=TRAINING_QUEUE_LEN))
+        self.prediction_queue = PredictionQueue(self.model, Queue(WORKERS), Queue(WORKERS), prediction_dict, 2)
 
         self.completed_generations = 0
 
@@ -72,20 +67,22 @@ class Trainer:
 
     def run_selfplay_session(self):
 
-        threads = [SelfPlayThread(self.prediction_queue, self.training_queue) for _ in range(WORKERS)]
+        threads = [SelfPlayThread(self.prediction_queue.queue,
+                                self.prediction_queue.workers,
+                                self.training_queue.queue,
+                                self.prediction_queue.prediction_dict,
+                                i+1) for i in range(WORKERS)]
+
+        for thread in threads:
+            thread.process.start()
 
         self.prediction_queue.start()
-        prediction_thread = PredictionQueueThread(self.prediction_queue)
-        prediction_thread.start()
+        self.prediction_queue.run_execution()
 
         for thread in threads:
-            thread.start()
-
-        for thread in threads:
-            thread.join()
+            thread.process.join()
 
         self.prediction_queue.stop()
-        prediction_thread.join()
 
     def run_training_session(self):
 
