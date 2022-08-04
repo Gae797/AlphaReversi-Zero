@@ -52,15 +52,15 @@ class AlphaReversiNetwork(tf.keras.Model):
 
         x, y = data
         policy_true = y[0]
-        value_true = tf.cast(y[1],dtype=tf.float32)
+        value_true = tf.expand_dims(tf.cast(y[1],dtype=tf.float32), axis=-1)
+
+        eps = 1e-8
 
         with tf.GradientTape() as tape:
             policy_pred, value_pred = self(x, training=True)
 
             value_loss = tf.math.square(value_true - value_pred)
-            policy_loss =  - tf.math.reduce_sum(policy_true * tf.math.log(policy_pred), axis=-1)
-
-            #TODO transpose predictions
+            policy_loss =  - tf.math.reduce_sum(policy_true * tf.math.log(policy_pred+eps), axis=-1)
 
             total_value_loss = tf.math.reduce_sum(value_loss)
             total_policy_loss = tf.math.reduce_sum(policy_loss)
@@ -70,8 +70,8 @@ class AlphaReversiNetwork(tf.keras.Model):
         grads = tape.gradient(loss, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
 
-        self.policy_loss_tracker.update_state(policy_loss)
-        self.value_loss_tracker.update_state(value_loss)
+        self.policy_loss_tracker.update_state(total_policy_loss)
+        self.value_loss_tracker.update_state(total_value_loss)
         self.total_loss_tracker.update_state(loss)
 
         return {

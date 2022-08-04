@@ -22,7 +22,8 @@ GOAL_GENERATION = 1
 STARTING_LEARNING_RATE = 0.1
 LR_DECREASING_STEPS = [] #To be set
 lr_schedule = LRSchedule(STARTING_LEARNING_RATE, 0, LR_DECREASING_STEPS) #TODO: load previous current step and lr
-OPTIMIZER = tf.keras.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9, name="SGD")
+#OPTIMIZER = tf.keras.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9, name="SGD")
+OPTIMIZER = tf.keras.optimizers.Adam(lr_schedule)
 
 #Remainder:
 #TODO: test extensively
