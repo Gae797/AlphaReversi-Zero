@@ -13,10 +13,10 @@ from src.environment.config import BOARD_SIZE
 
 class SelfPlay:
 
-    def __init__(self, prediction_queue, training_queue, prediction_dict, n_iterations, thread_number):
+    def __init__(self, prediction_queue, training_buffer, prediction_dict, n_iterations, thread_number):
 
         self.prediction_queue = prediction_queue
-        self.training_queue = training_queue
+        self.training_buffer = training_buffer
         self.prediction_dict = prediction_dict
         self.n_iterations = n_iterations
         self.thread_number = thread_number
@@ -38,14 +38,13 @@ class SelfPlay:
         while(not self.current_node.board.is_terminal):
             self.play_move()
             self.n_played_moves += 1
-            print(self.n_played_moves)
             self.update_temperature()
 
         self.outcome = self.current_node.board.reward
 
-        self.send_samples_to_queue()
+        self.send_samples_to_buffer()
 
-    def send_samples_to_queue(self):
+    def send_samples_to_buffer(self):
 
         samples = []
 
@@ -64,7 +63,7 @@ class SelfPlay:
 
             samples.append([inputs, outputs])
 
-        self.training_queue.extend(samples)
+        self.training_buffer.extend(samples)
 
     def update_temperature(self):
 

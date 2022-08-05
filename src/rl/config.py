@@ -2,7 +2,7 @@ import tensorflow as tf
 
 from src.rl.training.learning_rate_schedule import LRSchedule
 
-WORKERS = 1
+WORKERS = 8
 
 CONV_FILTERS = 128
 N_RESIDUAL_BLOCKS = 9
@@ -16,7 +16,7 @@ L2_REGULARIZER = tf.keras.regularizers.L2(l2=1e-4)
 
 EPOCHS_PER_STEP = 1 #2?
 TRAINING_STEPS_PER_GENERATION = 1
-N_GAMES_BEFORE_TRAINING = 1
+N_GAMES_BEFORE_TRAINING = 8
 GOAL_GENERATION = 1
 
 STARTING_LEARNING_RATE = 0.1

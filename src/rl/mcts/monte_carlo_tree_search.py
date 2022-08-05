@@ -71,10 +71,6 @@ class MonteCarloTS():
 
     def evaluate(self, node):
 
-        #node.estimated_value=0.1
-        #node.estimated_policy=np.zeros(len(node.board.legal_moves["indices"])).tolist()
-        #return
-
         pack = (node.board, self.thread_number)
         self.prediction_queue.put(pack)
 

@@ -13,7 +13,6 @@ class PredictionQueue:
         self.queue = queue
         self.collected_nodes = []
 
-        self.run = False
         self.timer = 0.0
 
         self.workers = workers_queue
@@ -28,29 +27,24 @@ class PredictionQueue:
     def passed_time(self):
         return time.time()-self.timer
 
-    def start(self):
-
-        self.run = True
-        self.timer = time.time()
-
-    def stop(self):
-
-        self.run = False
-
     def run_execution(self):
 
-        while(self.run):
-            start_time = time.time()
-            pack = self.queue.get()
-            print("--- %s seconds ---" % (time.time() - start_time))
-            self.collected_nodes.append(pack)
+        self.timer = time.time()
+        jobs_done = 0
+        n_workers = self.workers.qsize()
+
+        while(n_workers>0 or jobs_done==0):
+            if not self.queue.empty():
+                pack = self.queue.get()
+                self.collected_nodes.append(pack)
 
             n_workers = self.workers.qsize()
             size = len(self.collected_nodes)
 
-            if size>=n_workers or self.passed_time>self.max_await:
+            if size>0 and (size>=n_workers//2 or self.passed_time>self.max_await):
                 self.evaluate_nodes()
                 self.timer = time.time()
+                jobs_done += 1
 
     def evaluate_nodes(self):
 
@@ -74,7 +68,7 @@ class PredictionQueue:
 
         for i, pack in enumerate(self.collected_nodes):
             thread_number = pack[1]
-            prediction = [policies[i], values[i]]
+            prediction = [np.array(policies[i]), np.array(values[i])]
             self.prediction_dict[thread_number].put(prediction)
 
         self.collected_nodes.clear()

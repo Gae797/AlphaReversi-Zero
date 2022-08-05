@@ -8,10 +8,11 @@ from src.rl.config import *
 
 class TrainingQueue:
 
-    def __init__(self, model, queue):
+    def __init__(self, model, buffer, max_size):
 
         self.model = model
-        self.queue = queue
+        self.queue = deque(maxlen=max_size)
+        self.buffer = buffer
 
     def sample_queue(self):
 
@@ -59,6 +60,9 @@ class TrainingQueue:
         self.model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=EPOCHS_PER_STEP)
 
     def train(self, steps):
+
+        self.queue.extend(self.buffer)
+        self.buffer[:] = [] #Clear the buffer
 
         for i in range(steps):
             self.run_train_step()
