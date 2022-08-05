@@ -12,9 +12,7 @@ import time
 
 if __name__ == '__main__':
     trainer = Trainer()
-    start_time = time.time()
     trainer.run()
-    print("--- %s seconds ---" % (time.time() - start_time))
 
     #white_agent = RandomAgent()
     #black_agent = GreedyNetworkAgent(BOARD_SIZE, 9)

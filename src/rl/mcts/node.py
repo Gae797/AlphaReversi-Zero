@@ -23,7 +23,7 @@ class Node:
     def set_estimation(self, prediction):
 
         global_policy = prediction[0]
-        self.estimated_policy = global_policy[np.nonzero(global_policy)]
+        self.estimated_policy = global_policy[self.board.legal_moves["indices"]]
 
         assert len(self.estimated_policy)==len(self.board.legal_moves["indices"])
 

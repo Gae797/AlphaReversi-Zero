@@ -1,5 +1,6 @@
 from multiprocessing import Process, Queue, Manager
 from collections import deque
+import time
 
 from src.rl.training.training_queue import TrainingQueue
 from src.rl.mcts.prediction_queue import PredictionQueue
@@ -61,11 +62,13 @@ class Trainer:
         print("Training started")
 
         while(self.completed_generations != GOAL_GENERATION):
+            start_time = time.time()
             self.run_selfplay_session()
             print("Self play session completed")
             self.run_training_session()
             self.completed_generations += 1
             print("Generation {} completed".format(self.completed_generations))
+            print("--- %s seconds ---" % (time.time() - start_time))
 
         print("Training ended")
 
