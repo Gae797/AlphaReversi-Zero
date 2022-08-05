@@ -6,9 +6,11 @@ from src.game import Game
 from src.agents.random_agent import RandomAgent
 from src.agents.greedy_network_agent import GreedyNetworkAgent
 from src.environment.config import *
+from src.rl.config import *
 from src.rl.training.trainer import Trainer
 
 import time
+import os
 
 if __name__ == '__main__':
     trainer = Trainer()

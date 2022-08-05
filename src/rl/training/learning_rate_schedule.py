@@ -17,3 +17,12 @@ class LRSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
                 self.learning_rate = self.learning_rate / 10.0
 
         return self.learning_rate
+
+    def get_config(self):
+        return {"initial_learning_rate": self.learning_rate,
+                "initial_current_step": self.current_step,
+                "decreasing_steps": self.decreasing_steps}
+
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)

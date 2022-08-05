@@ -80,6 +80,14 @@ class AlphaReversiNetwork(tf.keras.Model):
             "total_loss": self.total_loss_tracker.result(),
         }
 
+    def get_config(self):
+        return {"n_squares": self.n_squares,
+                "n_residual_blocks":self.n_residual_blocks}
+
+    @classmethod
+    def from_config(cls, config):
+        return cls(**config)
+
 def build_model(board_size, n_residual_blocks, verbose=True):
 
     n_squares = board_size*board_size

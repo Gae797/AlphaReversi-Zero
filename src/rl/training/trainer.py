@@ -1,9 +1,13 @@
 from multiprocessing import Process, Queue, Manager
 from collections import deque
+import tensorflow as tf
 import time
+import os
+import pickle
 
 from src.rl.training.training_queue import TrainingQueue
 from src.rl.mcts.prediction_queue import PredictionQueue
+from src.rl.training.learning_rate_schedule import LRSchedule
 from src.rl.mcts.selfplay import SelfPlay
 import src.rl.architecture.network as network
 
@@ -47,17 +51,16 @@ class Trainer:
 
         prediction_dict = {i+1:Queue(1) for i in range(WORKERS)}
 
-        self.model = network.build_model(BOARD_SIZE, N_RESIDUAL_BLOCKS)
-        self.training_queue = TrainingQueue(self.model, games_buffer, TRAINING_QUEUE_LEN)
-        self.prediction_queue = PredictionQueue(self.model, Queue(WORKERS), Queue(WORKERS), prediction_dict, 2)
+        self.model, self.train_deque, self.completed_generations = self.load_checkpoint()
 
-        self.completed_generations = 0
-
-        #TODO: load weights and training queue and generation
+        self.training_queue = TrainingQueue(self.model, self.train_deque, games_buffer)
+        self.prediction_queue = PredictionQueue(self.model,
+                                                Queue(WORKERS),
+                                                Queue(WORKERS),
+                                                prediction_dict,
+                                                2)
 
     def run(self):
-
-        #TODO: save weights and training queue and generation
 
         print("Training started")
 
@@ -67,6 +70,7 @@ class Trainer:
             print("Self play session completed")
             self.run_training_session()
             self.completed_generations += 1
+            self.save_checkpoint()
             print("Generation {} completed".format(self.completed_generations))
             print("--- %s seconds ---" % (time.time() - start_time))
 
@@ -91,3 +95,51 @@ class Trainer:
     def run_training_session(self):
 
         self.training_queue.train(TRAINING_STEPS_PER_GENERATION)
+
+    def load_last_generation(self):
+
+        dirs = os.listdir(WEIGHTS_PATH)
+        if len(dirs)==0:
+            return None
+
+        else:
+            dirs.sort()
+            return int(dirs[-1][-1])
+
+    def save_checkpoint(self):
+
+        path = os.path.join(WEIGHTS_PATH, "Generation {}".format(self.completed_generations))
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        self.model.save_weights(os.path.join(path,"variables"))
+
+        with open(os.path.join(path, "training_deque.pickle"), 'wb') as handle:
+            pickle.dump(self.train_deque, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+        print("Checkpoint saved")
+
+    def load_checkpoint(self):
+
+        last_generation = self.load_last_generation()
+        model = network.build_model(BOARD_SIZE, N_RESIDUAL_BLOCKS)
+
+        if last_generation is None:
+            completed_generations = 0
+            train_deque = deque(maxlen=TRAINING_QUEUE_LEN)
+
+            print("Created new model for training")
+
+        else:
+            path = os.path.join(WEIGHTS_PATH, "Generation {}".format(last_generation))
+            model.load_weights(os.path.join(path, "variables"))
+
+            with open(os.path.join(path, "training_deque.pickle"), 'rb') as handle:
+                train_deque = pickle.load(handle)
+
+            completed_generations = last_generation
+
+            print("Loaded generation {}".format(last_generation))
+
+        return model, train_deque, completed_generations

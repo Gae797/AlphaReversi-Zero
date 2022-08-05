@@ -61,7 +61,7 @@ class PredictionQueue:
             legal_moves_batched.append(legal_moves)
 
         board_inputs_batched = np.array(board_inputs_batched)
-        legal_moves_batched = np.array(legal_moves_batched)
+        legal_moves_batched = np.array(legal_moves_batched, dtype=np.float32)
 
         with tf.device('/device:GPU:0'):
             policies, values = self.model_graph([board_inputs_batched, legal_moves_batched])

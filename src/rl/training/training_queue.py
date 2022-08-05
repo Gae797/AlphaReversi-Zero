@@ -8,10 +8,10 @@ from src.rl.config import *
 
 class TrainingQueue:
 
-    def __init__(self, model, buffer, max_size):
+    def __init__(self, model, queue, buffer):
 
         self.model = model
-        self.queue = deque(maxlen=max_size)
+        self.queue = queue
         self.buffer = buffer
 
     def sample_queue(self):
@@ -42,7 +42,7 @@ class TrainingQueue:
             value_outputs_batched.append(outputs[1])
 
         board_inputs_batched = np.array(board_inputs_batched)
-        legal_moves_batched = np.array(legal_moves_batched)
+        legal_moves_batched = np.array(legal_moves_batched, dtype=np.float32)
         policy_outputs_batched = np.array(policy_outputs_batched)
         value_outputs_batched = np.array(value_outputs_batched)
 

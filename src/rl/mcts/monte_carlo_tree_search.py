@@ -25,6 +25,8 @@ class MonteCarloTS():
             self.evaluate(self.root)
             self.backup(self.root)
 
+        self.add_dirichlet_noise(self.root)
+
     def run_search(self):
 
         for i in range(self.n_iterations):
@@ -32,14 +34,22 @@ class MonteCarloTS():
 
     def run_iteration(self):
 
-        #TODO: add Dir noise if root and self-play
-
         selected_node = self.select(self.root)
 
         if not selected_node.is_evaluated():
             self.evaluate(selected_node)
 
         self.backup(selected_node)
+
+    def add_dirichlet_noise(self, node):
+
+        n_actions = len(node.children)
+        alpha = min(1, 10.0/n_actions)
+        alpha_vector = [alpha] * n_actions
+
+        dirichlet_noise = np.random.dirichlet(alpha_vector)
+
+        node.estimated_policy = (1-EPS_DIRICHLET)*node.estimated_policy + EPS_DIRICHLET*dirichlet_noise
 
     def select(self, node):
 
