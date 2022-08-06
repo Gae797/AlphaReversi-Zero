@@ -4,14 +4,17 @@ from src.environment.config import *
 import src.environment.bitboard as bitboard_handler
 import src.environment.rules.legal_moves_generator as moves_generator
 import src.environment.rules.reverter as reverter
+from src.environment.symmetries import BoardSymmetry
 
 class Board:
 
-    def __init__(self, white_pieces=None, black_pieces=None, turn=None):
+    def __init__(self, white_pieces=None, black_pieces=None, turn=None, create_random_symmetry=False):
 
         self.white_pieces = white_pieces
         self.black_pieces = black_pieces
         self.turn = turn
+
+        self.create_random_symmetry = create_random_symmetry
 
         if self.white_pieces is None or self.black_pieces is None or self.turn is None:
             self.reset()
@@ -115,6 +118,11 @@ class Board:
         mover_pieces = bitboard_handler.bitwise([mover_pieces, reverted_pieces], "or", True)
         opponent_pieces = bitboard_handler.bitwise([opponent_pieces, reverted_pieces], "xor", True)
 
+        #Create symmetric board if requested
+        if self.create_random_symmetry:
+            mover_pieces = BoardSymmetry.symmetric(mover_pieces, BoardSymmetry.Operation.RANDOM)
+            opponent_pieces = BoardSymmetry.symmetric(opponent_pieces, BoardSymmetry.Operation.RANDOM)
+
         #Create and return new state
         if self.turn:
             white_pieces = mover_pieces
@@ -125,6 +133,6 @@ class Board:
             black_pieces = mover_pieces
             turn = True
 
-        new_board = Board(white_pieces, black_pieces, turn)
+        new_board = Board(white_pieces, black_pieces, turn, self.create_random_symmetry)
 
         return new_board

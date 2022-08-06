@@ -30,7 +30,7 @@ class SelfPlay:
 
     def simulate_game(self):
 
-        starting_position = Board()
+        starting_position = Board(create_random_symmetry=USE_SYMMETRIES)
         self.current_node = Node(starting_position)
 
         while(not self.current_node.board.is_terminal):

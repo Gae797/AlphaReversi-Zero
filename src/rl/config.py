@@ -6,10 +6,11 @@ WORKERS = 1
 
 CONV_FILTERS = 128
 N_RESIDUAL_BLOCKS = 9
-MCTS_ITERATIONS = 1
+MCTS_ITERATIONS = 100
 N_MOVES_HIGHEST_TEMPERATURE = 20
 CPUCT = 1 #To be set (3,4)?
 EPS_DIRICHLET = 0.25
+USE_SYMMETRIES = True
 
 TRAINING_QUEUE_LEN = 16384000 #To be set
 BATCH_SIZE = 128 #To be set
@@ -17,7 +18,7 @@ L2_REGULARIZER = tf.keras.regularizers.L2(l2=1e-4)
 
 EPOCHS_PER_STEP = 1 #2?
 TRAINING_POSITIONS = 204800
-N_GAMES_BEFORE_TRAINING = 1
+N_GAMES_BEFORE_TRAINING = 10
 GOAL_GENERATION = 1
 
 STARTING_LEARNING_RATE = 0.001
@@ -30,8 +31,6 @@ OPTIMIZER = tf.keras.optimizers.Adam(lr_schedule)
 WEIGHTS_PATH = "weights"
 
 #Remainder:
-#TODO gg2: simmetries
-#TODO gg2: handle repeated nodes in queue? (repetitions should disappear with simmetries)
 #TODO gg2: multiple nodes from each simulation
 #TODO gg2: dynamic MCTS
 #TODO gg2: tune hyperparameters and optimizations
@@ -41,3 +40,6 @@ WEIGHTS_PATH = "weights"
 #TODO gg3: Evaluation by matches with older versions or Edax (if succeded in implementing)
 #TODO gg4: Test learning with dummy board
 #TODO gg5: Create distributed system
+
+#TODO: change training set?
+#TODO: augment with symmetries?
