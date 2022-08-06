@@ -94,7 +94,7 @@ class Trainer:
 
     def run_training_session(self):
 
-        self.training_queue.train(TRAINING_STEPS_PER_GENERATION)
+        self.training_queue.train(TRAINING_POSITIONS // BATCH_SIZE)
 
     def load_last_generation(self):
 

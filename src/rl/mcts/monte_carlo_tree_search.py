@@ -10,13 +10,14 @@ import time
 
 class MonteCarloTS():
 
-    def __init__(self, root_node, prediction_queue, prediction_dict, n_iterations, thread_number):
+    def __init__(self, root_node, prediction_queue, prediction_dict, n_iterations, thread_number, local_model=None):
 
         self.root = root_node
         self.prediction_queue = prediction_queue
         self.prediction_dict = prediction_dict
         self.n_iterations = n_iterations
         self.thread_number = thread_number
+        self.local_model = local_model
 
         if not self.root.is_expanded():
             self.root.expand()
@@ -81,11 +82,23 @@ class MonteCarloTS():
 
     def evaluate(self, node):
 
-        pack = (node.board, self.thread_number)
-        self.prediction_queue.put(pack)
+        if self.local_model is None:
+            pack = (node.board, self.thread_number)
+            self.prediction_queue.put(pack)
 
-        prediction = self.prediction_dict[self.thread_number].get()
-        node.set_estimation(prediction)
+            prediction = self.prediction_dict[self.thread_number].get()
+            node.set_estimation(prediction)
+
+        else:
+            white_pieces, black_pieces, turn, legal_moves, reward = node.board.get_state()
+
+            board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
+            batched_board_inputs = np.expand_dims(board_inputs, axis=0)
+            batched_legal_moves = np.expand_dims(legal_moves, axis=0)
+
+            policy, value = self.model([batched_board_inputs, batched_legal_moves], training=False)
+            prediction = [np.array(policy), np.array(value)]
+            node.set_estimation(prediction)
 
     def backup(self, node):
 

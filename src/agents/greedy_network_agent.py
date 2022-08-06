@@ -6,11 +6,10 @@ import src.rl.architecture.network as network
 
 class GreedyNetworkAgent(AgentInterface):
 
-    def __init__(self, board_size, n_residual_blocks):
-
-        #TODO: load weights
+    def __init__(self, board_size, n_residual_blocks, weights):
 
         self.model = network.build_model(board_size, n_residual_blocks)
+        self.model.load_weights(weights)
 
     def play(self, board, timer):
 

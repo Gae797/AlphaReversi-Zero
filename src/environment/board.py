@@ -19,7 +19,15 @@ class Board:
         self.empty_squares = self.generate_empty_squares()
 
         self.legal_moves = self.generate_legal_moves()
-        self.is_terminal = len(self.legal_moves["indices"])==0
+
+        if len(self.legal_moves["indices"])==0:
+            self.turn = not turn
+            self.legal_moves = self.generate_legal_moves()
+            self.is_terminal = len(self.legal_moves["indices"])==0
+            if self.is_terminal:
+                self.turn = turn
+        else:
+            self.is_terminal = False
 
         self.reward = self.generate_reward()
 

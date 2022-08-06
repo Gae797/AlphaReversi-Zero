@@ -30,8 +30,6 @@ class SelfPlay:
 
     def simulate_game(self):
 
-        #TODO: add resign
-
         starting_position = Board()
         self.current_node = Node(starting_position)
 
