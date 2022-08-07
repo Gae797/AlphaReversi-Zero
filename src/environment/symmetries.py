@@ -38,6 +38,13 @@ class BoardSymmetry:
             return BoardSymmetry.symmetric(bitboard, BoardSymmetry.Operation(random_operation))
 
     @staticmethod
+    def random_symmetry(bitboard):
+        random_operation = random.randint(1, 8)
+        symmetry = BoardSymmetry.symmetric(bitboard, BoardSymmetry.Operation(random_operation))
+
+        return symmetry, random_operation
+
+    @staticmethod
     def identity(bitboard):
         return bitboard
 

@@ -36,7 +36,6 @@ class SelfPlay:
         while(not self.current_node.board.is_terminal):
             self.play_move()
             self.n_played_moves += 1
-            print(self.n_played_moves)
             self.update_temperature()
 
         self.outcome = self.current_node.board.reward

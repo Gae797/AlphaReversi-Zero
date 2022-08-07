@@ -120,8 +120,8 @@ class Board:
 
         #Create symmetric board if requested
         if self.create_random_symmetry:
-            mover_pieces = BoardSymmetry.symmetric(mover_pieces, BoardSymmetry.Operation.RANDOM)
-            opponent_pieces = BoardSymmetry.symmetric(opponent_pieces, BoardSymmetry.Operation.RANDOM)
+            mover_pieces, random_operation = BoardSymmetry.random_symmetry(mover_pieces)
+            opponent_pieces = BoardSymmetry.symmetric(opponent_pieces, BoardSymmetry.Operation(random_operation))
 
         #Create and return new state
         if self.turn:
