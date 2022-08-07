@@ -4,12 +4,13 @@ from src.gui.window import Window
 
 class Game:
 
-    def __init__(self, white_agent, black_agent, time_per_move=5, use_gui=True, draw_legal_moves=False):
+    def __init__(self, white_agent, black_agent, time_per_move=5, use_gui=True, draw_legal_moves=False, show_names=False):
 
         self.white_agent = white_agent
         self.black_agent = black_agent
         self.time_per_move = time_per_move
         self.use_gui = use_gui
+        self.show_names = show_names
 
         self.current_board = Board()
 
@@ -30,10 +31,21 @@ class Game:
         if self.current_board.is_terminal:
             if self.current_board.reward==0:
                 print("Draw")
+                result = (0.5, 0.5)
             elif self.current_board.reward==1:
-                print("White won")
+                result = (1.0, 0.0)
+                if self.show_names:
+                    print("{} won".format(self.white_agent.name))
+                else:
+                    print("White won")
             else:
-                print("Black won")
+                result = (0.0, 1.0)
+                if self.show_names:
+                    print("{} won".format(self.black_agent.name))
+                else:
+                    print("Black won")
+
+            return result
 
         else:
             self.play()

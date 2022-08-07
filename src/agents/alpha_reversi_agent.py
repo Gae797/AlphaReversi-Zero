@@ -8,7 +8,9 @@ from src.rl.mcts.node import Node
 
 class AlphaReversiAgent(AgentInterface):
 
-    def __init__(self, board_size, n_residual_blocks, weights, mcts_depth):
+    def __init__(self, board_size, n_residual_blocks, weights, mcts_depth, name="AlphaReversi Agent"):
+
+        self.name = name
 
         self.model = network.build_model(board_size, n_residual_blocks)
         self.model.load_weights(weights)

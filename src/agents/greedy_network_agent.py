@@ -6,7 +6,9 @@ import src.rl.architecture.network as network
 
 class GreedyNetworkAgent(AgentInterface):
 
-    def __init__(self, board_size, n_residual_blocks, weights):
+    def __init__(self, board_size, n_residual_blocks, weights, name= "Greedy Network Agent"):
+
+        self.name = name
 
         self.model = network.build_model(board_size, n_residual_blocks)
         self.model.load_weights(weights)

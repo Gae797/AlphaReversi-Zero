@@ -4,7 +4,9 @@ import random
 
 class RandomAgent(AgentInterface):
 
-    def __init__(self, seed=None):
+    def __init__(self, seed=None, name="Random agent"):
+
+        self.name = name
 
         if seed is not None:
             random.seed(seed)
