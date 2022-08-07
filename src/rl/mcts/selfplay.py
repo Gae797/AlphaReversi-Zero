@@ -36,6 +36,7 @@ class SelfPlay:
         while(not self.current_node.board.is_terminal):
             self.play_move()
             self.n_played_moves += 1
+            print(self.n_played_moves)
             self.update_temperature()
 
         self.outcome = self.current_node.board.reward
@@ -46,18 +47,20 @@ class SelfPlay:
 
         samples = []
 
-        for node in self.encountered_nodes:
+        for node, from_game in self.encountered_nodes:
 
             white_pieces, black_pieces, turn, legal_moves, reward = node.board.get_state(legal_moves_format="indices")
             board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
             masked_legal_moves = node.board.legal_moves["array"]
+
+            outcome_true = self.outcome if from_game else node.average_outcome
 
             search_policy = np.zeros(BOARD_SIZE*BOARD_SIZE)
             for index, value in zip(legal_moves, node.search_policy):
                 search_policy[index] = value
 
             inputs = [board_inputs, masked_legal_moves]
-            outputs = [search_policy, self.outcome]
+            outputs = [search_policy, outcome_true]
 
             samples.append([inputs, outputs])
 
@@ -83,6 +86,24 @@ class SelfPlay:
 
         return search_policy
 
+    def get_first_discarded_node(self, children, chosen_node, simulation_policy):
+
+        if len(children)==1:
+            return None
+
+        chosen_index = children.index(chosen_node)
+        del children[chosen_index]
+        del simulation_policy[chosen_index]
+
+        second_choice = random.choices(children, weights=simulation_policy)[0]
+
+        if second_choice.board.is_terminal or second_choice.visit_count<2:
+            return None
+
+        else:
+            second_choice.search_policy = self.get_search_policy(second_choice)
+            return second_choice
+
     def play_move(self):
 
         mcts = MonteCarloTS(self.current_node, self.prediction_queue, self.prediction_dict, self.n_iterations, self.thread_number)
@@ -94,7 +115,14 @@ class SelfPlay:
 
         move = random.choices(self.current_node.children, weights=simulation_policy)[0]
 
-        #TODO: add multiple nodes each time
-        self.encountered_nodes.append(self.current_node)
+        first_discarded = None
+        if KEEP_TWO_NODES:
+            first_discarded = self.get_first_discarded_node(self.current_node.children.copy(), move, simulation_policy.copy())
+
+        self.encountered_nodes.append((self.current_node,True))
         self.current_node = move
         self.current_node.parent = None
+
+        #Add a second node to encountered
+        if first_discarded is not None and KEEP_TWO_NODES:
+            self.encountered_nodes.append((first_discarded,False))

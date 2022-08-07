@@ -6,11 +6,12 @@ WORKERS = 1
 
 CONV_FILTERS = 128
 N_RESIDUAL_BLOCKS = 9
-MCTS_ITERATIONS = 100
+MCTS_ITERATIONS = {0:100,4:200,11:400}
 N_MOVES_HIGHEST_TEMPERATURE = 20
 CPUCT = 1 #To be set (3,4)?
 EPS_DIRICHLET = 0.25
 USE_SYMMETRIES = True
+KEEP_TWO_NODES = True
 
 TRAINING_QUEUE_LEN = 16384000 #To be set
 BATCH_SIZE = 128 #To be set
@@ -31,15 +32,15 @@ OPTIMIZER = tf.keras.optimizers.Adam(lr_schedule)
 WEIGHTS_PATH = "weights"
 
 #Remainder:
-#TODO gg2: multiple nodes from each simulation
-#TODO gg2: dynamic MCTS
 #TODO gg2: tune hyperparameters and optimizations
 #TODO gg3: Edax agent
 #TODO gg1: Match class
 #TODO gg3: Evaluation by node value stability
 #TODO gg3: Evaluation by matches with older versions or Edax (if succeded in implementing)
+#TODO gg4: Collect all problems and bug and fix them
 #TODO gg4: Test learning with dummy board
 #TODO gg5: Create distributed system
 
+#Try only if it fails:
 #TODO: change training set?
 #TODO: augment with symmetries?

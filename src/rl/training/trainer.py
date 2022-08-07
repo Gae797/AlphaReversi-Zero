@@ -16,16 +16,17 @@ from src.environment.config import BOARD_SIZE
 
 class SelfPlayThread():
 
-    def __init__(self, prediction_queue, workers_queue, training_buffer, prediction_dict, thread_number):
+    def __init__(self, prediction_queue, workers_queue, training_buffer, prediction_dict, thread_number, depth):
 
         self.process = Process(target=SelfPlayThread.play_games, kwargs={"prediction_queue":prediction_queue,
                         "workers_queue":workers_queue,
                         "training_buffer":training_buffer,
                         "prediction_dict":prediction_dict,
-                        "thread_number": thread_number})
+                        "thread_number": thread_number,
+                        "depth":depth})
 
     @staticmethod
-    def play_games(prediction_queue, workers_queue, training_buffer, prediction_dict, thread_number):
+    def play_games(prediction_queue, workers_queue, training_buffer, prediction_dict, thread_number, depth):
 
         workers_queue.put(thread_number)
 
@@ -35,7 +36,7 @@ class SelfPlayThread():
         completed_games = 0
 
         for i in range(n_games):
-            selfplay = SelfPlay(prediction_queue, training_buffer, prediction_dict, MCTS_ITERATIONS, thread_number)
+            selfplay = SelfPlay(prediction_queue, training_buffer, prediction_dict, depth, thread_number)
             selfplay.simulate_game()
             completed_games += 1
             print("Thread_{} has completed its game number {}".format(thread_number,completed_games))
@@ -78,11 +79,16 @@ class Trainer:
 
     def run_selfplay_session(self):
 
+        for step in MCTS_ITERATIONS:
+            if self.completed_generations >= step:
+                depth = MCTS_ITERATIONS[step]
+
         threads = [SelfPlayThread(self.prediction_queue.queue,
                                 self.prediction_queue.workers,
                                 self.training_queue.buffer,
                                 self.prediction_queue.prediction_dict,
-                                i+1) for i in range(WORKERS)]
+                                i+1,
+                                depth) for i in range(WORKERS)]
 
         for thread in threads:
             thread.process.start()
