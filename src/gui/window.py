@@ -25,3 +25,8 @@ class Window:
         sprite = self.canvas.create_image(SIDE//2,SIDE//2,image=image)
 
         self.root.update()
+
+    def close(self):
+
+        self.root.quit()
+        self.root.destroy()

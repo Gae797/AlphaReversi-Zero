@@ -33,11 +33,8 @@ WEIGHTS_PATH = "weights"
 
 
 #To be fixed:
-#TODO: check for os windows to play against Edax and write on README
 #TODO: find solution for optimizer
 #TODO: adjust learning rate schedule with generation
-#TODO: fix GUI in Match
-#TODO: bring GUI to another thread
 #TODO: find solution for training
 #TODO refactor configs
 #TODO: refactor agents
@@ -46,8 +43,6 @@ WEIGHTS_PATH = "weights"
 
 #Remainder:
 #TODO gg2: tune hyperparameters and optimizations
-#TODO gg3: Evaluation by node value stability
-#TODO gg3: Evaluation by matches with older versions or Edax (if succeded in implementing)
 #TODO gg4: Collect all problems and bug and fix them
 #TODO gg4: Test learning with dummy board
 #TODO gg5: Create distributed system

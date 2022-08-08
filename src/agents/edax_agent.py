@@ -1,4 +1,5 @@
 import time
+import platform
 from subprocess import Popen, PIPE
 from tempfile import TemporaryFile
 
@@ -10,6 +11,12 @@ from src.environment.config import *
 class EdaxAgent(AgentInterface):
 
     def __init__(self, depth, name="Edax Agent"):
+
+        if platform.system() != "Windows":
+            raise "Edax agent can be launched only on Windows systems"
+
+        if BOARD_SIZE != 8:
+            raise "Edax agent can be launched only on 8x8 boards"
 
         self.name = name
 

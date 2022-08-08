@@ -21,7 +21,6 @@ class Game:
 
         self.current_board = Board()
 
-        #TODO GUI in other thread?
         if use_gui:
             self.game_window = Window(draw_legal_moves)
 
@@ -35,6 +34,9 @@ class Game:
         result = self.play_move()
 
         self.close_external_engines()
+
+        if self.use_gui:
+            self.game_window.close()
 
         return result
 

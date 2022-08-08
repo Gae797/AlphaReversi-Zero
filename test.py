@@ -21,7 +21,7 @@ if __name__ == '__main__':
     #trainer = Trainer()
     #trainer.run()
 
-    evaluator = Evaluator(None, 10, 10, 10)
+    evaluator = Evaluator(None, 10, 10, 10, use_gui=True)
     evaluations = evaluator.evaluate()
     print(evaluations)
 
