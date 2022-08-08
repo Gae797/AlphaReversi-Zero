@@ -100,7 +100,9 @@ class Trainer:
 
     def run_training_session(self):
 
-        self.training_queue.train(TRAINING_POSITIONS // BATCH_SIZE)
+        training_steps = TRAINING_POSITIONS // BATCH_SIZE
+
+        self.training_queue.train(training_steps)
 
     def load_last_generation(self):
 
@@ -129,7 +131,7 @@ class Trainer:
     def load_checkpoint(self):
 
         completed_generations = self.load_last_generation()
-        
+
         lr_schedule.set_generation(completed_generations)
         model = network.build_model(BOARD_SIZE, N_RESIDUAL_BLOCKS)
 
@@ -139,12 +141,12 @@ class Trainer:
             print("Created new model for training")
 
         else:
-            path = os.path.join(WEIGHTS_PATH, "Generation {}".format(last_generation))
+            path = os.path.join(WEIGHTS_PATH, "Generation {}".format(completed_generations))
             model.load_weights(os.path.join(path, "variables"))
 
             with open(os.path.join(path, "training_deque.pickle"), 'rb') as handle:
                 train_deque = pickle.load(handle)
 
-            print("Loaded generation {}".format(last_generation))
+            print("Loaded generation {}".format(completed_generations))
 
         return model, train_deque, completed_generations

@@ -62,8 +62,8 @@ class AlphaReversiNetwork(tf.keras.Model):
             value_loss = tf.math.square(value_true - value_pred)
             policy_loss =  - tf.math.reduce_sum(policy_true * tf.math.log(policy_pred+eps), axis=-1)
 
-            total_value_loss = tf.math.reduce_sum(value_loss)
-            total_policy_loss = tf.math.reduce_sum(policy_loss)
+            total_value_loss = tf.math.reduce_mean(value_loss)
+            total_policy_loss = tf.math.reduce_mean(policy_loss)
 
             loss = total_value_loss + total_policy_loss + self.losses
 

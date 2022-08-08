@@ -11,19 +11,17 @@ from src.environment.config import *
 from src.rl.config import *
 from src.rl.training.trainer import Trainer
 from src.evaluation.match import Match
-from src.evaluation.evaluator import Evaluator
+from src.evaluation.evaluator import Evaluator, evaluate_generations
 
 import time
 import os
 
 if __name__ == '__main__':
 
-    #trainer = Trainer()
-    #trainer.run()
+    trainer = Trainer()
+    trainer.run()
 
-    evaluator = Evaluator(None, 10, 10, 10, use_gui=True)
-    evaluations = evaluator.evaluate()
-    print(evaluations)
+    #evaluate_generations([1,2,3],10,10,10,True)
 
     #start_time = time.time()
     #print("--- %s seconds ---" % (time.time() - start_time))

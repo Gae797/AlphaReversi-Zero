@@ -10,7 +10,7 @@ class ValueHead(layers.Layer):
 
         super(ValueHead, self).__init__()
 
-        self.convolutional_layer = layers.Conv2D(1, #32?
+        self.convolutional_layer = layers.Conv2D(32, #1?
                                                 1,
                                                 strides=1,
                                                 padding="same",

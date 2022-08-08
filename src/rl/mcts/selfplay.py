@@ -94,6 +94,9 @@ class SelfPlay:
         del children[chosen_index]
         del simulation_policy[chosen_index]
 
+        if sum(simulation_policy)==0.0:
+            return None
+
         second_choice = random.choices(children, weights=simulation_policy)[0]
 
         if second_choice.board.is_terminal or second_choice.visit_count<2:

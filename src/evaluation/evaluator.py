@@ -68,7 +68,7 @@ def evaluate_generations(generations, network_depth, engine_depth, match_length,
 
     for generation in generations:
 
-        weights = os.path.join(WEIGHTS_PATH, "Generation {}".format(last_generation), "variables")
+        weights = os.path.join(WEIGHTS_PATH, "Generation {}".format(generation), "variables")
 
         evaluator = Evaluator(weights, network_depth, engine_depth, match_length, use_gui)
         score, avg_value_drop = evaluator.evaluate()

@@ -10,7 +10,7 @@ class PolicyHead(layers.Layer):
 
         super(PolicyHead, self).__init__()
 
-        self.convolutional_layer = layers.Conv2D(2, #32?
+        self.convolutional_layer = layers.Conv2D(32, #2
                                                 1,
                                                 strides=1,
                                                 padding="same",
