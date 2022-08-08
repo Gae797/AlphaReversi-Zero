@@ -106,7 +106,7 @@ class Trainer:
 
         dirs = os.listdir(WEIGHTS_PATH)
         if len(dirs)==0:
-            return None
+            return 0
 
         else:
             dirs.sort()
@@ -128,11 +128,12 @@ class Trainer:
 
     def load_checkpoint(self):
 
-        last_generation = self.load_last_generation()
+        completed_generations = self.load_last_generation()
+        
+        lr_schedule.set_generation(completed_generations)
         model = network.build_model(BOARD_SIZE, N_RESIDUAL_BLOCKS)
 
-        if last_generation is None:
-            completed_generations = 0
+        if completed_generations==0:
             train_deque = deque(maxlen=TRAINING_QUEUE_LEN)
 
             print("Created new model for training")
@@ -143,8 +144,6 @@ class Trainer:
 
             with open(os.path.join(path, "training_deque.pickle"), 'rb') as handle:
                 train_deque = pickle.load(handle)
-
-            completed_generations = last_generation
 
             print("Loaded generation {}".format(last_generation))
 

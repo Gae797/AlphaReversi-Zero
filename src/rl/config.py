@@ -22,10 +22,8 @@ TRAINING_POSITIONS = 204800
 N_GAMES_BEFORE_TRAINING = 10
 GOAL_GENERATION = 1
 
-STARTING_LEARNING_RATE = 0.001
-LR_DECREASING_STEPS = [] #To be set
-#TODO: change depending just on current generation
-lr_schedule = LRSchedule(STARTING_LEARNING_RATE, 0, LR_DECREASING_STEPS)
+LEARNING_RATES = {0:0.003, 3:0.001, 10: 0.0001}
+lr_schedule = LRSchedule(LEARNING_RATES)
 #OPTIMIZER = tf.keras.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9, name="SGD")
 OPTIMIZER = tf.keras.optimizers.Adam(lr_schedule)
 
@@ -34,8 +32,9 @@ WEIGHTS_PATH = "weights"
 
 #To be fixed:
 #TODO: find solution for optimizer
-#TODO: adjust learning rate schedule with generation
 #TODO: find solution for training
+
+#Refactoring:
 #TODO refactor configs
 #TODO: refactor agents
 #TODO: refactor board
