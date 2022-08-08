@@ -33,7 +33,6 @@ WEIGHTS_PATH = "weights"
 
 
 #To be fixed:
-#TODO: start match from position (https://berg.earthlingz.de/xot/download.php?lang=en)
 #TODO: check for os windows to play against Edax and write on README
 #TODO: find solution for optimizer
 #TODO: adjust learning rate schedule with generation

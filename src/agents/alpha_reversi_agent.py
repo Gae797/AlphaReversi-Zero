@@ -18,6 +18,8 @@ class AlphaReversiAgent(AgentInterface):
 
         self.depth = mcts_depth
 
+        self.evaluator = None
+
     def play(self, board, timer):
 
         root = Node(board)
@@ -29,8 +31,21 @@ class AlphaReversiAgent(AgentInterface):
 
         move = board.legal_moves["indices"][action]
 
+        if self.evaluator is not None:
+            network_move_eval = root.children[action].average_outcome
+            engine_move_eval = root.average_outcome
+            self.evaluator.get_evaluations(network_move_eval, engine_move_eval)
+
         return move
 
     @property
     def is_external_engine(self):
         return False
+
+    def attach_evaluator(self, evaluator):
+
+        self.evaluator = evaluator
+
+    def remove_evaluator(self):
+
+        self.evaluator = None

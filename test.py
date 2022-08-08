@@ -11,6 +11,7 @@ from src.environment.config import *
 from src.rl.config import *
 from src.rl.training.trainer import Trainer
 from src.evaluation.match import Match
+from src.evaluation.evaluator import Evaluator
 
 import time
 import os
@@ -20,14 +21,9 @@ if __name__ == '__main__':
     #trainer = Trainer()
     #trainer.run()
 
-    agent_1 = AlphaReversiAgent(BOARD_SIZE, 9, None, 10)
-    agent_2 = EdaxAgent(10)
-
-    #match = Match(agent_1, agent_2, 10, use_gui=False)
-    #match.play()
-
-    game = Game(agent_1, agent_2, show_names=True, start_from_random_position=True)
-    game.play_game()
+    evaluator = Evaluator(None, 10, 10, 10)
+    evaluations = evaluator.evaluate()
+    print(evaluations)
 
     #start_time = time.time()
     #print("--- %s seconds ---" % (time.time() - start_time))

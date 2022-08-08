@@ -16,6 +16,8 @@ class Match:
         self.scores_agent_1 = 0.0
         self.scores_agent_2 = 0.0
 
+        self.evaluator = None
+
     def play(self):
 
         for i in range(self.match_length):
@@ -34,7 +36,7 @@ class Match:
                 result = game.play_game()
                 self.scores_agent_1 += result[0]
                 self.scores_agent_2 += result[1]
-                
+
             else:
                 game = Game(self.agent_2,
                             self.agent_1,
@@ -48,6 +50,9 @@ class Match:
                 self.scores_agent_1 += result[1]
                 self.scores_agent_2 += result[0]
 
+            if self.evaluator is not None:
+                self.evaluator.notify_game_end()
+
         print("Match completed")
         print("{}    {}-{}    {}".format(self.agent_1.name,
                                         self.scores_agent_1,
@@ -55,3 +60,11 @@ class Match:
                                         self.agent_2.name))
 
         return (self.scores_agent_1, self.scores_agent_2)
+
+    def attach_evaluator(self, evaluator):
+
+        self.evaluator = evaluator
+
+    def remove_evaluator(self):
+
+        self.evaluator = None
