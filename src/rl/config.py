@@ -34,7 +34,6 @@ WEIGHTS_PATH = "weights"
 #Remainder:
 #TODO gg2: tune hyperparameters and optimizations
 #TODO gg3: Edax agent
-#TODO gg1: Match class
 #TODO gg3: Evaluation by node value stability
 #TODO gg3: Evaluation by matches with older versions or Edax (if succeded in implementing)
 #TODO gg4: Collect all problems and bug and fix them

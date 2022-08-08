@@ -11,9 +11,25 @@ def value_to_string(value):
 
     return format(value, '#0{}b'.format(LENGTH + 2))[:LENGTH+2]
 
+def string_reformat(string_seq):
+
+    len_seq = len(string_seq)
+    len_expected = LENGTH + 2
+
+    diff = len_expected - len_seq
+
+    if diff > 0:
+        return string_seq + "0"*diff
+    else:
+        return string_seq
+
 def print_bitboard(bitboard):
 
-    binary_string = value_to_string(bitboard) if not type(bitboard) is str else bitboard
+    if not type(bitboard) is str:
+        binary_string = value_to_string(bitboard)
+    else:
+        binary_string = bitboard
+
     binary_string = binary_string[2:]
 
     for i in range(BOARD_SIZE-1, -1, -1):
@@ -117,7 +133,11 @@ def starting_bitboard():
 
 def flip(bitboard, return_as_string=False):
 
-    binary_string = value_to_string(bitboard) if not type(bitboard) is str else bitboard
+    if not type(bitboard) is str:
+        binary_string = value_to_string(bitboard)
+    else:
+        binary_string = bitboard
+
     binary_string = binary_string[2:]
 
     flipped = "0b"
@@ -128,7 +148,11 @@ def flip(bitboard, return_as_string=False):
 
 def mirror(bitboard, return_as_string=False):
 
-    binary_string = value_to_string(bitboard) if not type(bitboard) is str else bitboard
+    if not type(bitboard) is str:
+        binary_string = value_to_string(bitboard)
+    else:
+        binary_string = bitboard
+
     binary_string = binary_string[2:]
 
     mirrored = "0b"
@@ -140,7 +164,11 @@ def mirror(bitboard, return_as_string=False):
 
 def rotate_90(bitboard, return_as_string=False):
 
-    binary_string = value_to_string(bitboard) if not type(bitboard) is str else bitboard
+    if not type(bitboard) is str:
+        binary_string = value_to_string(bitboard)
+    else:
+        binary_string = bitboard
+
     binary_string = binary_string[2:]
 
     rotated = "0b"
@@ -152,7 +180,11 @@ def rotate_90(bitboard, return_as_string=False):
 
 def rotate_270(bitboard, return_as_string=False):
 
-    binary_string = value_to_string(bitboard) if not type(bitboard) is str else bitboard
+    if not type(bitboard) is str:
+        binary_string = value_to_string(bitboard)
+    else:
+        binary_string = bitboard
+
     binary_string = binary_string[2:]
 
     rotated = "0b"

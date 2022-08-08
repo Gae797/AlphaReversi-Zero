@@ -11,7 +11,8 @@ class GreedyNetworkAgent(AgentInterface):
         self.name = name
 
         self.model = network.build_model(board_size, n_residual_blocks)
-        self.model.load_weights(weights)
+        if weights is not None:
+            self.model.load_weights(weights)
 
     def play(self, board, timer):
 
@@ -26,3 +27,7 @@ class GreedyNetworkAgent(AgentInterface):
         move = np.argmax(policy)
 
         return move
+
+    @property
+    def is_external_engine(self):
+        return False

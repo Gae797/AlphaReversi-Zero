@@ -17,3 +17,7 @@ class RandomAgent(AgentInterface):
         move = random.choice(legal_moves)
 
         return move
+
+    @property
+    def is_external_engine(self):
+        return False

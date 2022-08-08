@@ -12,6 +12,8 @@ def generate_mask_bottom_up(start, count):
         diagonal+= "1" + "0"*BOARD_SIZE
     diagonal+="1"
 
+    diagonal = bitboard_handler.string_reformat(diagonal)
+
     return diagonal
 
 def generate_masks():

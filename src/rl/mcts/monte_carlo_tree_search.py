@@ -96,8 +96,8 @@ class MonteCarloTS():
             batched_board_inputs = np.expand_dims(board_inputs, axis=0)
             batched_legal_moves = np.expand_dims(legal_moves, axis=0)
 
-            policy, value = self.model([batched_board_inputs, batched_legal_moves], training=False)
-            prediction = [np.array(policy), np.array(value)]
+            policy, value = self.local_model([batched_board_inputs, batched_legal_moves], training=False)
+            prediction = [np.array(policy[0]), np.array(value[0])]
             node.set_estimation(prediction)
 
     def backup(self, node):
