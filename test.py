@@ -23,11 +23,11 @@ if __name__ == '__main__':
     agent_1 = AlphaReversiAgent(BOARD_SIZE, 9, None, 10)
     agent_2 = EdaxAgent(10)
 
-    match = Match(agent_1, agent_2, 10, use_gui=False)
-    match.play()
+    #match = Match(agent_1, agent_2, 10, use_gui=False)
+    #match.play()
 
-    #game = Game(white_agent, black_agent, show_names=True)
-    #game.play_game()
+    game = Game(agent_1, agent_2, show_names=True, start_from_random_position=True)
+    game.play_game()
 
     #start_time = time.time()
     #print("--- %s seconds ---" % (time.time() - start_time))

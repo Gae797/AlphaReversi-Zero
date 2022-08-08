@@ -31,9 +31,22 @@ OPTIMIZER = tf.keras.optimizers.Adam(lr_schedule)
 
 WEIGHTS_PATH = "weights"
 
+
+#To be fixed:
+#TODO: start match from position (https://berg.earthlingz.de/xot/download.php?lang=en)
+#TODO: check for os windows to play against Edax and write on README
+#TODO: find solution for optimizer
+#TODO: adjust learning rate schedule with generation
+#TODO: fix GUI in Match
+#TODO: bring GUI to another thread
+#TODO: find solution for training
+#TODO refactor configs
+#TODO: refactor agents
+#TODO: refactor board
+#TODO: rafactor Trainer and SelfPlayThread
+
 #Remainder:
 #TODO gg2: tune hyperparameters and optimizations
-#TODO gg3: Edax agent
 #TODO gg3: Evaluation by node value stability
 #TODO gg3: Evaluation by matches with older versions or Edax (if succeded in implementing)
 #TODO gg4: Collect all problems and bug and fix them
@@ -43,3 +56,4 @@ WEIGHTS_PATH = "weights"
 #Try only if it fails:
 #TODO: change training set?
 #TODO: augment with symmetries?
+#TODO: add resign?
