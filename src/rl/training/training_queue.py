@@ -3,6 +3,7 @@ import random
 from collections import deque
 
 import src.rl.architecture.network as network
+from src.rl.training.training_set_generator import Generator
 
 from src.rl.config import *
 
@@ -14,55 +15,11 @@ class TrainingQueue:
         self.queue = queue
         self.buffer = buffer
 
-    def sample_queue(self):
-
-        listed_queue = list(self.queue)
-        samples = random.choices(listed_queue, k=BATCH_SIZE)
-
-        return samples
-
-    def unpack_samples(self, samples):
-
-        x_train = []
-        y_train = []
-
-        board_inputs_batched = []
-        legal_moves_batched = []
-        policy_outputs_batched = []
-        value_outputs_batched = []
-
-        for sample in samples:
-            inputs = sample[0]
-            outputs = sample[1]
-
-            board_inputs_batched.append(inputs[0])
-            legal_moves_batched.append(inputs[1])
-
-            policy_outputs_batched.append(outputs[0])
-            value_outputs_batched.append(outputs[1])
-
-        board_inputs_batched = np.array(board_inputs_batched)
-        legal_moves_batched = np.array(legal_moves_batched, dtype=np.float32)
-        policy_outputs_batched = np.array(policy_outputs_batched)
-        value_outputs_batched = np.array(value_outputs_batched)
-
-        x_train = [board_inputs_batched, legal_moves_batched]
-        y_train = [policy_outputs_batched, value_outputs_batched]
-
-        return x_train, y_train
-
-    def run_train_step(self):
-
-        samples = self.sample_queue()
-
-        x_train, y_train = self.unpack_samples(samples)
-
-        self.model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=EPOCHS_PER_STEP)
-
-    def train(self, steps):
+    def train(self):
 
         self.queue.extend(self.buffer)
         self.buffer[:] = [] #Clear the buffer
 
-        for i in range(steps):
-            self.run_train_step()
+        training_generator = Generator(list(self.queue), BATCH_SIZE, TRAINING_POSITIONS)
+
+        self.model.fit(training_generator, epochs=EPOCHS_PER_GENERATION)

@@ -25,7 +25,7 @@ TRAINING_QUEUE_LEN = 16384000 #To be set
 BATCH_SIZE = 1024 #To be set
 L2_REGULARIZER = tf.keras.regularizers.L2(l2=1e-4)
 
-EPOCHS_PER_STEP = 1 #2?
+EPOCHS_PER_GENERATION = 1 #2?
 TRAINING_POSITIONS = 204800
 N_GAMES_BEFORE_TRAINING = 1
 GOAL_GENERATION = 1
@@ -37,7 +37,6 @@ OPTIMIZER = tf.keras.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9, nam
 
 
 #To be fixed:
-#TODO: find solution for training (Generator or not?)
 #TODO: create separate matplotlib graph for drop values and adjust evaluation systems (average better?)
 #TODO: Tune hyperparameters
 #TODO: run first test

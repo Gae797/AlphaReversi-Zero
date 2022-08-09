@@ -71,7 +71,7 @@ class Trainer:
             print("Self play session completed")
             self.run_training_session()
             self.completed_generations += 1
-            lr_schedule.set_generation(completed_generations)
+            lr_schedule.set_generation(self.completed_generations)
             self.save_checkpoint()
             print("Generation {} completed".format(self.completed_generations))
             print("--- %s seconds ---" % (time.time() - start_time))
@@ -101,9 +101,7 @@ class Trainer:
 
     def run_training_session(self):
 
-        training_steps = TRAINING_POSITIONS // BATCH_SIZE
-
-        self.training_queue.train(training_steps)
+        self.training_queue.train()
 
     def load_last_generation(self):
 
