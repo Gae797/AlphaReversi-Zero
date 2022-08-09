@@ -37,10 +37,8 @@ OPTIMIZER = tf.keras.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9, nam
 
 
 #To be fixed:
-#TODO: add resign from generation 10 (parameter)
-#TODO: augment with symmetries
 #TODO: find solution for training (Generator or not?)
-#TODO: create separate matplotlib graph for drop values
+#TODO: create separate matplotlib graph for drop values and adjust evaluation systems (average better?)
 #TODO: Tune hyperparameters
 #TODO: run first test
 #TODO: refactoring of code

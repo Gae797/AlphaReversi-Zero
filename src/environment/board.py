@@ -34,6 +34,13 @@ class Board:
 
         self.reward = self.generate_reward()
 
+    def apply_symmetry(self, symmetry):
+
+        white_pieces = BoardSymmetry.symmetric(self.white_pieces, symmetry)
+        black_pieces = BoardSymmetry.symmetric(self.black_pieces, symmetry)
+
+        return Board(white_pieces, black_pieces, self.turn, self.create_random_symmetry)
+
     def reset(self):
 
         if START_EMPTY_BOARD:

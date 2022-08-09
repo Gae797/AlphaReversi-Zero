@@ -71,6 +71,7 @@ class Trainer:
             print("Self play session completed")
             self.run_training_session()
             self.completed_generations += 1
+            lr_schedule.set_generation(completed_generations)
             self.save_checkpoint()
             print("Generation {} completed".format(self.completed_generations))
             print("--- %s seconds ---" % (time.time() - start_time))

@@ -7,6 +7,7 @@ from src.rl.mcts.node import Node
 from src.rl.mcts.prediction_queue import PredictionQueue
 from src.rl.training.training_queue import TrainingQueue
 from src.environment.board import Board
+from src.environment.symmetries import BoardSymmetry
 
 from src.rl.config import *
 from src.environment.config import BOARD_SIZE
@@ -46,22 +47,34 @@ class SelfPlay:
 
         samples = []
 
-        for node, from_game in self.encountered_nodes:
+        if USE_SYMMETRIES:
+            symmetries = BoardSymmetry.symmetries
+        else:
+            symmetries = [BoardSymmetry.Operation.IDENTITY]
 
-            white_pieces, black_pieces, turn, legal_moves, reward = node.board.get_state(legal_moves_format="indices")
-            board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
-            masked_legal_moves = node.board.legal_moves["array"]
+        for node, from_game in self.encountered_nodes:
 
             outcome_true = self.outcome if from_game else node.average_outcome
 
             search_policy = np.zeros(BOARD_SIZE*BOARD_SIZE)
-            for index, value in zip(legal_moves, node.search_policy):
+            for index, value in zip(node.board.legal_moves["indices"], node.search_policy):
                 search_policy[index] = value
 
-            inputs = [board_inputs, masked_legal_moves]
-            outputs = [search_policy, outcome_true]
+            for symmetry in symmetries:
 
-            samples.append([inputs, outputs])
+                symmetric_board = node.board.apply_symmetry(symmetry)
+
+                white_pieces, black_pieces, turn, legal_moves, reward = symmetric_board.get_state(legal_moves_format="indices")
+                board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
+                masked_legal_moves = symmetric_board.legal_moves["array"]
+
+                symmetric_search_policy = BoardSymmetry.symmetric(search_policy.tolist(),symmetry)
+                symmetric_search_policy = np.array(symmetric_search_policy)
+
+                inputs = [board_inputs, masked_legal_moves]
+                outputs = [search_policy, outcome_true]
+
+                samples.append([inputs, outputs])
 
         self.training_buffer.extend(samples)
 
