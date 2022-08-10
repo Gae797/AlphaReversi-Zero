@@ -60,7 +60,7 @@ class Trainer:
             self.completed_generations += 1
             lr_schedule.set_generation(self.completed_generations)
             self.save_checkpoint()
-            
+
             print("Generation {} completed".format(self.completed_generations))
             print("--- %s seconds ---" % (time.time() - start_time))
 
@@ -194,17 +194,17 @@ class Trainer:
         else:
             symmetries = [BoardSymmetry.Operation.IDENTITY]
 
-        for node, from_game, outcome in buffer:
+        for node_board, node_search_policy, node_average_outcome, from_game, outcome in buffer:
 
-            outcome_true = outcome if from_game else node.average_outcome
+            outcome_true = outcome if from_game else node_average_outcome
 
             search_policy = np.zeros(BOARD_SIZE*BOARD_SIZE)
-            for index, value in zip(node.board.legal_moves["indices"], node.search_policy):
+            for index, value in zip(node_board.legal_moves["indices"], node_search_policy):
                 search_policy[index] = value
 
             for symmetry in symmetries:
 
-                symmetric_board = node.board.apply_symmetry(symmetry)
+                symmetric_board = node_board.apply_symmetry(symmetry)
 
                 white_pieces, black_pieces, turn, legal_moves, reward = symmetric_board.get_state(legal_moves_format="indices")
                 board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
