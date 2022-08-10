@@ -1,35 +1,7 @@
 import src.environment.bitboard as bitboard_handler
 
 from src.environment.config import *
-
-masks_bottom_up = []
-masks_top_down = []
-
-def generate_mask_bottom_up(start, count):
-
-    diagonal = "0b" + "0"*start
-    for i in range(count-1):
-        diagonal+= "1" + "0"*BOARD_SIZE
-    diagonal+="1"
-
-    diagonal = bitboard_handler.string_reformat(diagonal)
-
-    return diagonal
-
-def generate_masks():
-
-    global masks_bottom_up, masks_top_down
-
-    for i in range(BOARD_SIZE-1):
-        masks_bottom_up.append(generate_mask_bottom_up(i, BOARD_SIZE-i))
-        if i!=0:
-            masks_bottom_up.append(generate_mask_bottom_up(i*BOARD_SIZE, BOARD_SIZE-i))
-
-    masks_top_down = [bitboard_handler.mirror(mask) for mask in masks_bottom_up]
-
-generate_masks()
-
-#-------------------------------------------------------------------------------
+from src.environment.rules.masks_generator import MasksGenerator
 
 def complete_search(mover_pieces, opponent_pieces, empty_squares):
 
@@ -98,6 +70,8 @@ def horizontal_search(mover_pieces, opponent_pieces, empty_squares):
 def diagonal_search(mover_pieces, opponent_pieces, empty_squares):
 
     legal_moves = []
+
+    masks_bottom_up, masks_top_down = MasksGenerator.get_masks()
 
     for mask in masks_bottom_up:
         legal_moves.append(general_diagonal_search(mover_pieces, opponent_pieces, empty_squares, mask, True, True))

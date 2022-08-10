@@ -54,8 +54,7 @@ class EdaxAgent(AgentInterface):
         init_params = [EDAX_ENGINE_PATH,
                         "eval-file", EDAX_EVAL_PATH,
                         "verbose", "0",
-                        "book-usage", "on",
-                        "book-randomness", "8",
+                        "book-usage", "off",
                         "l", str(self.depth)]
 
         self.engine = Popen(init_params, stdin=PIPE, stdout=self.stdout, encoding='utf8')

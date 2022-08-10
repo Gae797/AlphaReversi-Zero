@@ -28,23 +28,13 @@ BATCH_SIZE = 1024 #To be set
 
 EPOCHS_PER_GENERATION = 1 #2?
 N_GAMES_BEFORE_TRAINING = 1
-GOAL_GENERATION = 1
+GOAL_GENERATION = 10
 
 LEARNING_RATES = {0:0.003, 3:0.001, 10: 0.0001}
 lr_schedule = LRSchedule(LEARNING_RATES)
 OPTIMIZER = tf.keras.optimizers.SGD(learning_rate=lr_schedule, momentum=0.9, name="SGD")
 
-
-#To be fixed:
 #TODO: create separate matplotlib graph for drop values and adjust evaluation systems (average better?)
 #TODO: Tune hyperparameters
-#TODO: run first test
-#TODO: refactoring of code
 #TODO: create distributed system
 #TODO: Train
-
-#Refactoring:
-#TODO refactor configs
-#TODO: refactor agents
-#TODO: refactor board
-#TODO: rafactor Trainer and SelfPlayThread

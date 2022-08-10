@@ -23,14 +23,7 @@ class Board:
 
         self.legal_moves = self.generate_legal_moves()
 
-        if len(self.legal_moves["indices"])==0:
-            self.turn = not turn
-            self.legal_moves = self.generate_legal_moves()
-            self.is_terminal = len(self.legal_moves["indices"])==0
-            if self.is_terminal:
-                self.turn = turn
-        else:
-            self.is_terminal = False
+        self.check_pass_or_terminate()
 
         self.reward = self.generate_reward()
 
@@ -51,6 +44,17 @@ class Board:
             self.white_pieces, self.black_pieces = bitboard_handler.starting_bitboard()
 
         self.turn = False #Black to move
+
+    def check_pass_or_terminate(self):
+
+        if len(self.legal_moves["indices"])==0:
+            self.turn = not self.turn
+            self.legal_moves = self.generate_legal_moves()
+            self.is_terminal = len(self.legal_moves["indices"])==0
+            if self.is_terminal:
+                self.turn = not self.turn
+        else:
+            self.is_terminal = False
 
     def generate_empty_squares(self):
 

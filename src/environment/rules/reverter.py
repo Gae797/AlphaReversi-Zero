@@ -1,6 +1,6 @@
 from src.environment.config import *
 import src.environment.bitboard as bitboard_handler
-from src.environment.rules.legal_moves_generator import masks_bottom_up, masks_top_down
+from src.environment.rules.masks_generator import MasksGenerator
 
 def complete_search(mover_pieces, opponent_pieces, selected_move):
 
@@ -74,6 +74,8 @@ def horizontal_search(mover_pieces, opponent_pieces, selected_move):
 def diagonal_search(mover_pieces, opponent_pieces, selected_move):
 
     reverted_pieces = []
+
+    masks_bottom_up, masks_top_down = MasksGenerator.get_masks()
 
     for mask in masks_bottom_up:
         reverted_pieces.append(general_diagonal_search(mover_pieces, opponent_pieces, selected_move, mask, True, True))
