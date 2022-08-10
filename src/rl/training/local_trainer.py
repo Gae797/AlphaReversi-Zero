@@ -152,13 +152,22 @@ class Trainer:
         n_completed_generations = self.completed_generations
 
         data = pickle.dumps([weights, n_completed_generations, n_required_games])
+        data_size = len(data).to_bytes(4,"big")
+
+        self.conn.send(data_size)
         self.conn.send(data)
 
         print("Data sent")
 
     def receive_buffer(self):
 
-        buffer = self.conn.recv(DATA_MAX_SIZE)
+        buffer_size = self.conn.recv(4)
+        buffer_size = int.from_bytes(buffer_size,"big")
+
+        buffer = bytearray()
+        while len(buffer) < buffer_size:
+            packet = self.conn.recv(buffer_size - len(buffer))
+            buffer.extend(packet)
 
         print("Received games")
 

@@ -79,13 +79,22 @@ class RemoteTrainer:
         self.games_buffer[:] = []
 
         data = pickle.dumps(buffer)
+        data_size = len(data).to_bytes(4,"big")
+
+        self.socket.send(data_size)
         self.socket.send(data)
 
         print("Games sent")
 
     def receive_data(self):
 
-        data = self.socket.recv(DATA_MAX_SIZE)
+        data_size = self.socket.recv(4)
+        data_size = int.from_bytes(data_size,"big")
+
+        data = bytearray()
+        while len(data) < data_size:
+            packet = self.socket.recv(data_size - len(data))
+            data.extend(packet)
 
         print("Data received")
 

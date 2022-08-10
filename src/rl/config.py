@@ -6,7 +6,7 @@ from src.rl.training.learning_rate_schedule import LRSchedule
 LOCAL_WORKERS = 2
 REMOTE_WORKERS = 2
 USE_REMOTE = True
-DATA_MAX_SIZE = 1024*1024*512
+#DATA_MAX_SIZE = 1024*1024*512
 HOST = "26.190.192.100"
 PORT = 25600
 
