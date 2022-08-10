@@ -1,3 +1,5 @@
+import pickle
+import socket
 from multiprocessing import Process, Queue, Manager
 from collections import deque
 
@@ -10,23 +12,42 @@ from src.environment.config import BOARD_SIZE
 
 class RemoteTrainer:
 
-    def __init__(self, weights, completed_generations, games_buffer):
+    def __init__(self):
 
-        self.games_buffer = games_buffer
-        self.completed_generations = completed_generations
+        self.manager = Manager()
+        self.games_buffer = self.manager.list()
+
+        self.completed_generations = 0
+        self.games_to_play = 0
 
         self.model = network.build_model(BOARD_SIZE, N_RESIDUAL_BLOCKS)
-        self.model.load_weights(weights)
 
-        prediction_dict = {i+1:Queue(1) for i in range(WORKERS)}
+        prediction_dict = {i+1:Queue(1) for i in range(REMOTE_WORKERS)}
 
         self.prediction_queue = PredictionQueue(self.model,
-                                                Queue(WORKERS),
-                                                Queue(WORKERS),
+                                                Queue(REMOTE_WORKERS),
+                                                Queue(REMOTE_WORKERS),
                                                 prediction_dict,
                                                 2)
 
+        self.init_socket()
+
+    def init_socket(self):
+
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.settimeout(None)
+        self.socket.connect((HOST, PORT))
+
     def run(self):
+
+        #TODO check goal generation
+
+        while(True):
+            self.receive_data()
+            self.run_selfplay_session()
+            self.send_buffer()
+
+    def run_selfplay_session(self):
 
         for step in MCTS_ITERATIONS:
             if self.completed_generations >= step:
@@ -37,7 +58,10 @@ class RemoteTrainer:
                                 self.games_buffer,
                                 self.prediction_queue.prediction_dict,
                                 i+1,
-                                depth) for i in range(WORKERS)]
+                                depth,
+                                self.games_to_play,
+                                REMOTE_WORKERS,
+                                True) for i in range(REMOTE_WORKERS)]
 
         for thread in threads:
             thread.process.start()
@@ -46,3 +70,28 @@ class RemoteTrainer:
 
         for thread in threads:
             thread.process.join()
+
+    def send_buffer(self):
+
+        buffer = []
+        buffer.extend(self.games_buffer)
+
+        self.games_buffer[:] = []
+
+        data = pickle.dumps(buffer)
+        self.socket.send(data)
+
+        print("Games sent")
+
+    def receive_data(self):
+
+        data = self.socket.recv(DATA_MAX_SIZE)
+
+        print("Data received")
+
+        unpacked_data = pickle.loads(data)
+        weights = unpacked_data[0]
+        self.completed_generations = unpacked_data[1]
+        self.games_to_play = unpacked_data[2]
+
+        self.model.set_weights(weights)

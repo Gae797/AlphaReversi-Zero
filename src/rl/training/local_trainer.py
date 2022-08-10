@@ -4,6 +4,7 @@ import tensorflow as tf
 import time
 import os
 import pickle
+import socket
 
 from src.rl.training.training_queue import TrainingQueue
 from src.rl.mcts.prediction_queue import PredictionQueue
@@ -21,16 +22,26 @@ class Trainer:
         self.manager = Manager()
         games_buffer = self.manager.list()
 
-        prediction_dict = {i+1:Queue(1) for i in range(WORKERS)}
+        prediction_dict = {i+1:Queue(1) for i in range(LOCAL_WORKERS)}
 
         self.model, self.train_deque, self.completed_generations = self.load_checkpoint()
 
         self.training_queue = TrainingQueue(self.model, self.train_deque, games_buffer)
         self.prediction_queue = PredictionQueue(self.model,
-                                                Queue(WORKERS),
-                                                Queue(WORKERS),
+                                                Queue(LOCAL_WORKERS),
+                                                Queue(LOCAL_WORKERS),
                                                 prediction_dict,
                                                 2)
+
+        self.init_socket()
+
+    def init_socket(self):
+
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.bind((HOST, PORT))
+
+        self.socket.listen(1)
+        self.conn, self.address = self.socket.accept()
 
     def run(self):
 
@@ -49,7 +60,17 @@ class Trainer:
 
         print("Training ended")
 
+        self.socket.close()
+
     def run_selfplay_session(self):
+
+        #TODO check USE_REMOTE
+
+        games_per_worker = N_GAMES_BEFORE_TRAINING // (LOCAL_WORKERS + REMOTE_WORKERS)
+        n_local_games = games_per_worker * LOCAL_WORKERS
+        n_remote_games = games_per_worker * REMOTE_WORKERS
+
+        self.send_data(n_remote_games)
 
         for step in MCTS_ITERATIONS:
             if self.completed_generations >= step:
@@ -60,7 +81,9 @@ class Trainer:
                                 self.training_queue.buffer,
                                 self.prediction_queue.prediction_dict,
                                 i+1,
-                                depth) for i in range(WORKERS)]
+                                depth,
+                                n_local_games,
+                                LOCAL_WORKERS) for i in range(LOCAL_WORKERS)]
 
         for thread in threads:
             thread.process.start()
@@ -69,6 +92,8 @@ class Trainer:
 
         for thread in threads:
             thread.process.join()
+
+        self.receive_buffer()
 
     def run_training_session(self):
 
@@ -120,3 +145,23 @@ class Trainer:
             print("Loaded generation {}".format(completed_generations))
 
         return model, train_deque, completed_generations
+
+    def send_data(self, n_required_games):
+
+        weights = self.model.get_weights()
+        n_completed_generations = self.completed_generations
+
+        data = pickle.dumps([weights, n_completed_generations, n_required_games])
+        self.conn.send(data)
+
+        print("Data sent")
+
+    def receive_buffer(self):
+
+        buffer = self.conn.recv(DATA_MAX_SIZE)
+
+        print("Received games")
+
+        unpacked_buffer = pickle.loads(buffer)
+
+        #TODO: unpack games and apply symmetries

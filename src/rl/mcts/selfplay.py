@@ -14,13 +14,14 @@ from src.environment.config import BOARD_SIZE
 
 class SelfPlay:
 
-    def __init__(self, prediction_queue, training_buffer, prediction_dict, n_iterations, thread_number):
+    def __init__(self, prediction_queue, training_buffer, prediction_dict, n_iterations, thread_number, remote=False):
 
         self.prediction_queue = prediction_queue
         self.training_buffer = training_buffer
         self.prediction_dict = prediction_dict
         self.n_iterations = n_iterations
         self.thread_number = thread_number
+        self.remote = remote
 
         self.current_node = None
         self.temperature = 1.0
@@ -47,34 +48,39 @@ class SelfPlay:
 
         samples = []
 
-        if USE_SYMMETRIES:
-            symmetries = BoardSymmetry.symmetries
+        if not self.remote:
+            if USE_SYMMETRIES:
+                symmetries = BoardSymmetry.symmetries
+            else:
+                symmetries = [BoardSymmetry.Operation.IDENTITY]
+
+            for node, from_game in self.encountered_nodes:
+
+                outcome_true = self.outcome if from_game else node.average_outcome
+
+                search_policy = np.zeros(BOARD_SIZE*BOARD_SIZE)
+                for index, value in zip(node.board.legal_moves["indices"], node.search_policy):
+                    search_policy[index] = value
+
+                for symmetry in symmetries:
+
+                    symmetric_board = node.board.apply_symmetry(symmetry)
+
+                    white_pieces, black_pieces, turn, legal_moves, reward = symmetric_board.get_state(legal_moves_format="indices")
+                    board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
+                    masked_legal_moves = symmetric_board.legal_moves["array"]
+
+                    symmetric_search_policy = BoardSymmetry.symmetric(search_policy.tolist(),symmetry)
+                    symmetric_search_policy = np.array(symmetric_search_policy)
+
+                    inputs = [board_inputs, masked_legal_moves]
+                    outputs = [symmetric_search_policy, outcome_true]
+
+                    samples.append([inputs, outputs])
+
         else:
-            symmetries = [BoardSymmetry.Operation.IDENTITY]
-
-        for node, from_game in self.encountered_nodes:
-
-            outcome_true = self.outcome if from_game else node.average_outcome
-
-            search_policy = np.zeros(BOARD_SIZE*BOARD_SIZE)
-            for index, value in zip(node.board.legal_moves["indices"], node.search_policy):
-                search_policy[index] = value
-
-            for symmetry in symmetries:
-
-                symmetric_board = node.board.apply_symmetry(symmetry)
-
-                white_pieces, black_pieces, turn, legal_moves, reward = symmetric_board.get_state(legal_moves_format="indices")
-                board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
-                masked_legal_moves = symmetric_board.legal_moves["array"]
-
-                symmetric_search_policy = BoardSymmetry.symmetric(search_policy.tolist(),symmetry)
-                symmetric_search_policy = np.array(symmetric_search_policy)
-
-                inputs = [board_inputs, masked_legal_moves]
-                outputs = [symmetric_search_policy, outcome_true]
-
-                samples.append([inputs, outputs])
+            for node, from_game in self.encountered_nodes:
+                samples.append([node, from_game, self.outcome])
 
         self.training_buffer.extend(samples)
 
