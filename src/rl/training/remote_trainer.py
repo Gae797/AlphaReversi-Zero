@@ -40,12 +40,13 @@ class RemoteTrainer:
 
     def run(self):
 
-        #TODO check goal generation
-
-        while(True):
+        while(self.completed_generations != GOAL_GENERATION):
             self.receive_data()
             self.run_selfplay_session()
             self.send_buffer()
+            self.completed_generations += 1
+
+        self.socket.close()
 
     def run_selfplay_session(self):
 

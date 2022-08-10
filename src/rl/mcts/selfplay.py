@@ -80,7 +80,7 @@ class SelfPlay:
 
         else:
             for node, from_game in self.encountered_nodes:
-                samples.append([node, from_game, self.outcome])
+                samples.append((node, from_game, self.outcome))
 
         self.training_buffer.extend(samples)
 

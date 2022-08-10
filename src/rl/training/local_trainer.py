@@ -10,6 +10,8 @@ from src.rl.training.training_queue import TrainingQueue
 from src.rl.mcts.prediction_queue import PredictionQueue
 from src.rl.training.learning_rate_schedule import LRSchedule
 from src.rl.training.player import SelfPlayThread
+from src.environment.board import Board
+from src.environment.symmetries import BoardSymmetry
 import src.rl.architecture.network as network
 
 from src.rl.config import *
@@ -33,7 +35,8 @@ class Trainer:
                                                 prediction_dict,
                                                 2)
 
-        self.init_socket()
+        if USE_REMOTE:
+            self.init_socket()
 
     def init_socket(self):
 
@@ -49,28 +52,34 @@ class Trainer:
 
         while(self.completed_generations != GOAL_GENERATION):
             start_time = time.time()
+
             self.run_selfplay_session()
             print("Self play session completed")
+
             self.run_training_session()
             self.completed_generations += 1
             lr_schedule.set_generation(self.completed_generations)
             self.save_checkpoint()
+            
             print("Generation {} completed".format(self.completed_generations))
             print("--- %s seconds ---" % (time.time() - start_time))
 
         print("Training ended")
 
-        self.socket.close()
+        if USE_REMOTE:
+            self.socket.close()
 
     def run_selfplay_session(self):
 
-        #TODO check USE_REMOTE
+        if USE_REMOTE:
+            games_per_worker = N_GAMES_BEFORE_TRAINING // (LOCAL_WORKERS + REMOTE_WORKERS)
+            n_local_games = games_per_worker * LOCAL_WORKERS
+            n_remote_games = games_per_worker * REMOTE_WORKERS
 
-        games_per_worker = N_GAMES_BEFORE_TRAINING // (LOCAL_WORKERS + REMOTE_WORKERS)
-        n_local_games = games_per_worker * LOCAL_WORKERS
-        n_remote_games = games_per_worker * REMOTE_WORKERS
+            self.send_data(n_remote_games)
 
-        self.send_data(n_remote_games)
+        else:
+            n_local_games = N_GAMES_BEFORE_TRAINING // LOCAL_WORKERS
 
         for step in MCTS_ITERATIONS:
             if self.completed_generations >= step:
@@ -93,7 +102,8 @@ class Trainer:
         for thread in threads:
             thread.process.join()
 
-        self.receive_buffer()
+        if USE_REMOTE:
+            self.receive_buffer()
 
     def run_training_session(self):
 
@@ -169,8 +179,43 @@ class Trainer:
             packet = self.conn.recv(buffer_size - len(buffer))
             buffer.extend(packet)
 
-        print("Received games")
+        print("Games received")
 
         unpacked_buffer = pickle.loads(buffer)
 
-        #TODO: unpack games and apply symmetries
+        self.send_remote_games_to_trainer_queue(unpacked_buffer)
+
+    def send_remote_games_to_trainer_queue(self, buffer):
+
+        samples = []
+
+        if USE_SYMMETRIES:
+            symmetries = BoardSymmetry.symmetries
+        else:
+            symmetries = [BoardSymmetry.Operation.IDENTITY]
+
+        for node, from_game, outcome in buffer:
+
+            outcome_true = outcome if from_game else node.average_outcome
+
+            search_policy = np.zeros(BOARD_SIZE*BOARD_SIZE)
+            for index, value in zip(node.board.legal_moves["indices"], node.search_policy):
+                search_policy[index] = value
+
+            for symmetry in symmetries:
+
+                symmetric_board = node.board.apply_symmetry(symmetry)
+
+                white_pieces, black_pieces, turn, legal_moves, reward = symmetric_board.get_state(legal_moves_format="indices")
+                board_inputs = np.stack([white_pieces, black_pieces, turn], axis=-1)
+                masked_legal_moves = symmetric_board.legal_moves["array"]
+
+                symmetric_search_policy = BoardSymmetry.symmetric(search_policy.tolist(),symmetry)
+                symmetric_search_policy = np.array(symmetric_search_policy)
+
+                inputs = [board_inputs, masked_legal_moves]
+                outputs = [symmetric_search_policy, outcome_true]
+
+                samples.append([inputs, outputs])
+
+        self.training_buffer.extend(samples)
