@@ -1,5 +1,5 @@
 from src.agents.agent_interface import AgentInterface
-from src.game import Game
+from src.environment.game import Game
 
 class Match:
 
