@@ -9,7 +9,7 @@ from src.agents.alpha_reversi_agent import AlphaReversiAgent
 from src.agents.edax_agent import EdaxAgent
 from src.environment.config import *
 from src.rl.config import *
-from src.rl.training.trainer import Trainer
+from src.rl.training.local_trainer import Trainer
 from src.evaluation.match import Match
 from src.evaluation.evaluator import Evaluator, evaluate_generations
 
