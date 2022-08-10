@@ -3,7 +3,7 @@ import tensorflow as tf
 from src.rl.training.learning_rate_schedule import LRSchedule
 
 #Multiprocessing
-WORKERS = 1
+WORKERS = 4
 
 #Paths
 WEIGHTS_PATH = "weights"
@@ -27,7 +27,7 @@ TRAINING_POSITIONS = 10240 #16384000
 BATCH_SIZE = 1024 #To be set
 
 EPOCHS_PER_GENERATION = 1 #2?
-N_GAMES_BEFORE_TRAINING = 1
+N_GAMES_BEFORE_TRAINING = 8
 GOAL_GENERATION = 10
 
 LEARNING_RATES = {0:0.003, 3:0.001, 10: 0.0001}
