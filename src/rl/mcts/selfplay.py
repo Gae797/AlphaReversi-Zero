@@ -72,7 +72,7 @@ class SelfPlay:
                 symmetric_search_policy = np.array(symmetric_search_policy)
 
                 inputs = [board_inputs, masked_legal_moves]
-                outputs = [search_policy, outcome_true]
+                outputs = [symmetric_search_policy, outcome_true]
 
                 samples.append([inputs, outputs])
 

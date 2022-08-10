@@ -20,7 +20,7 @@ class AlphaReversiAgent(AgentInterface):
 
         self.evaluator = None
 
-    def play(self, board, timer):
+    def play(self, board):
 
         root = Node(board)
         mcts = MonteCarloTS(root, None, None, self.depth, None, self.model)

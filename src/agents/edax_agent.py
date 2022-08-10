@@ -24,7 +24,7 @@ class EdaxAgent(AgentInterface):
 
         self.engine_started = False
 
-    def play(self, board, timer):
+    def play(self, board):
 
         self.engine.stdin.write("go\n")
         self.engine.stdin.flush()

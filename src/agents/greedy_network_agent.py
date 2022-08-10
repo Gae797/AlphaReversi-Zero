@@ -14,7 +14,7 @@ class GreedyNetworkAgent(AgentInterface):
         if weights is not None:
             self.model.load_weights(weights)
 
-    def play(self, board, timer):
+    def play(self, board):
 
         white_pieces, black_pieces, turn, legal_moves, reward = board.get_state()
 

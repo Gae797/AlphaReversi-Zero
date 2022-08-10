@@ -21,6 +21,18 @@ if __name__ == '__main__':
     trainer = Trainer()
     trainer.run()
 
+    #generation_1 = 2
+    #generation_2 = 4
+
+    #weights_1 = os.path.join(WEIGHTS_PATH, "Generation {}".format(generation_1), "variables")
+    #weights_2 = os.path.join(WEIGHTS_PATH, "Generation {}".format(generation_2), "variables")
+
+    #agent_1 = AlphaReversiAgent(BOARD_SIZE, N_RESIDUAL_BLOCKS, weights_1, 200, name="Generation {}".format(generation_1))
+    #agent_2 = AlphaReversiAgent(BOARD_SIZE, N_RESIDUAL_BLOCKS, weights_2, 200, name="Generation {}".format(generation_2))
+
+    #match = Match(agent_1, agent_2, 10, use_gui=True, start_from_random_position=False)
+    #match.play()
+
     #evaluate_generations([1,2,3],10,10,10,True)
 
     #start_time = time.time()
