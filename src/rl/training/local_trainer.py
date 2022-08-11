@@ -1,6 +1,7 @@
 from multiprocessing import Process, Queue, Manager
 from collections import deque
 import tensorflow as tf
+import numpy as np
 import time
 import os
 import pickle
@@ -79,7 +80,7 @@ class Trainer:
             self.send_data(n_remote_games)
 
         else:
-            n_local_games = N_GAMES_BEFORE_TRAINING // LOCAL_WORKERS
+            n_local_games = N_GAMES_BEFORE_TRAINING
 
         for step in MCTS_ITERATIONS:
             if self.completed_generations >= step:
@@ -218,4 +219,4 @@ class Trainer:
 
                 samples.append([inputs, outputs])
 
-        self.training_buffer.extend(samples)
+        self.training_queue.buffer.extend(samples)
