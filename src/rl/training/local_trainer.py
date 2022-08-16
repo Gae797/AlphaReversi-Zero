@@ -47,6 +47,8 @@ class Trainer:
         self.socket.listen(1)
         self.conn, self.address = self.socket.accept()
 
+        print("Client connected")
+
     def run(self):
 
         print("Training started")
@@ -74,8 +76,8 @@ class Trainer:
 
         if USE_REMOTE:
             games_per_worker = N_GAMES_BEFORE_TRAINING // (LOCAL_WORKERS + REMOTE_WORKERS)
-            n_local_games = games_per_worker * LOCAL_WORKERS
-            n_remote_games = games_per_worker * REMOTE_WORKERS
+            n_local_games = (games_per_worker-2) * LOCAL_WORKERS
+            n_remote_games = (games_per_worker+1) * REMOTE_WORKERS
 
             self.send_data(n_remote_games)
 
@@ -117,8 +119,8 @@ class Trainer:
             return 0
 
         else:
-            dirs.sort()
-            return int(dirs[-1][-1])
+            gens = [int(dir.split()[-1]) for dir in dirs]
+            return max(gens)
 
     def save_checkpoint(self):
 

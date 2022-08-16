@@ -123,7 +123,7 @@ class SelfPlay:
             return None
 
         else:
-            second_choice.search_policy = self.get_search_policy(second_choice)
+            second_choice.search_policy = self.get_search_policy(second_choice, self.temperature)
             return second_choice
 
     def play_move(self):
@@ -131,9 +131,9 @@ class SelfPlay:
         mcts = MonteCarloTS(self.current_node, self.prediction_queue, self.prediction_dict, self.n_iterations, self.thread_number)
         mcts.run_search()
 
-        self.current_node.search_policy = self.get_search_policy(self.current_node)
-
         simulation_policy = self.get_search_policy(self.current_node, self.temperature)
+
+        self.current_node.search_policy = simulation_policy
 
         move = random.choices(self.current_node.children, weights=simulation_policy)[0]
 

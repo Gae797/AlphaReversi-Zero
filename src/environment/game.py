@@ -9,12 +9,11 @@ from src.environment.config import *
 
 class Game:
 
-    def __init__(self, white_agent, black_agent, time_per_move=5, use_gui=True,
-                draw_legal_moves=False, show_names=False, start_from_random_position=False):
+    def __init__(self, white_agent, black_agent, use_gui=True, draw_legal_moves=False,
+                show_names=False, start_from_random_position=False):
 
         self.white_agent = white_agent
         self.black_agent = black_agent
-        self.time_per_move = time_per_move
         self.use_gui = use_gui
         self.show_names = show_names
         self.start_from_random_position = start_from_random_position
@@ -46,7 +45,7 @@ class Game:
         playing_agent = self.white_agent if turn else self.black_agent
         opponent_agent = self.white_agent if not turn else self.black_agent
 
-        move_number = playing_agent.play(self.current_board, self.time_per_move)
+        move_number = playing_agent.play(self.current_board)
         self.current_board = self.current_board.move(move_number)
 
         if self.use_gui:

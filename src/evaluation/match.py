@@ -3,13 +3,12 @@ from src.environment.game import Game
 
 class Match:
 
-    def __init__(self, agent_1, agent_2, match_length, time_per_move=5,
+    def __init__(self, agent_1, agent_2, match_length,
                 use_gui=True, start_from_random_position=False):
 
         self.agent_1 = agent_1
         self.agent_2 = agent_2
         self.match_length = match_length
-        self.time_per_move = time_per_move
         self.use_gui = use_gui
         self.start_from_random_position = start_from_random_position
 
@@ -27,7 +26,6 @@ class Match:
             if i%2==0:
                 game = Game(self.agent_1,
                             self.agent_2,
-                            self.time_per_move,
                             self.use_gui,
                             False,
                             True,
@@ -40,7 +38,6 @@ class Match:
             else:
                 game = Game(self.agent_2,
                             self.agent_1,
-                            self.time_per_move,
                             self.use_gui,
                             False,
                             True,
