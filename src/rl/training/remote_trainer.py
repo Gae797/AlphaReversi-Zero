@@ -36,8 +36,7 @@ class RemoteTrainer:
 
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(None)
-        ip_server = self.socket.gethostbyname_ex("gaetanosigno.ddns.net")[2][0]
-        self.socket.connect((ip_server, PORT))
+        self.socket.connect((HOST, PORT))
 
     def run(self):
 

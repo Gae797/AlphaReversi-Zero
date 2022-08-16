@@ -6,7 +6,7 @@ from src.rl.training.learning_rate_schedule import LRSchedule
 LOCAL_WORKERS = 16
 REMOTE_WORKERS = 24
 USE_REMOTE = True
-HOST = "192.168.1.124"
+HOST = "25.67.231.114"
 PORT = 25600
 
 #Paths
