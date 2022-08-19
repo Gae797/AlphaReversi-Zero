@@ -1,3 +1,7 @@
+'''
+This modules hanldes the Graphical User Interface to show a game
+'''
+
 from PIL import Image, ImageDraw, ImageTk
 
 from src.environment.board import Board

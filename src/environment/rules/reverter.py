@@ -1,3 +1,7 @@
+'''
+This set of functions determine which pieces to revert after a move has been played
+'''
+
 from src.environment.config import *
 import src.environment.bitboard as bitboard_handler
 from src.environment.rules.masks_generator import MasksGenerator
@@ -17,15 +21,19 @@ def general_search(mover_pieces, opponent_pieces, selected_move, step):
     reverted_pieces = bitboard_handler.empty_bitboard()
 
     for i in range(BOARD_SIZE-1):
+        #Shift toward the given direction
         selected_move = bitboard_handler.shift(selected_move, step)
 
+        #Stop the search if pieces of the moving side are encountered
         check_end = bitboard_handler.bitwise([selected_move,mover_pieces], "and")
         if check_end!=0:
             return reverted_pieces
         else:
+            #Update pieces to be reverted if opponent pieces are found along the given direction
             check_opponent = bitboard_handler.bitwise([selected_move,opponent_pieces], "and")
             if check_opponent!=0:
                 reverted_pieces = bitboard_handler.bitwise([reverted_pieces, selected_move], "or")
+            #Revert no pieces if empty squares are found along the given direction
             else:
                 return 0
 
@@ -49,6 +57,8 @@ def general_diagonal_search(mover_pieces, opponent_pieces, selected_move, diagon
 
 def vertical_search(mover_pieces, opponent_pieces, selected_move):
 
+    #Search for pieces to be reverted vertically
+
     up_reverted_pieces = general_search(mover_pieces, opponent_pieces, selected_move, BOARD_SIZE)
     down_reverted_pieces = general_search(mover_pieces, opponent_pieces, selected_move, -BOARD_SIZE)
 
@@ -58,6 +68,9 @@ def vertical_search(mover_pieces, opponent_pieces, selected_move):
 
 def horizontal_search(mover_pieces, opponent_pieces, selected_move):
 
+    #Search for pieces to be reverted horizontally
+
+    #Rotate 90 degrees for the faster parallel vertical search
     rotated_mover_pieces = bitboard_handler.rotate_90(mover_pieces)
     rotated_opponent_pieces = bitboard_handler.rotate_90(opponent_pieces)
     rotated_selected_move = bitboard_handler.rotate_90(selected_move)
@@ -67,11 +80,14 @@ def horizontal_search(mover_pieces, opponent_pieces, selected_move):
 
     rotated_horizontal_reverted_pieces = bitboard_handler.bitwise([right_reverted_pieces, left_reverted_pieces], "or")
 
+    #Anti-rotate 90 degrees to recover the original orientation
     horizontal_reverted_pieces = bitboard_handler.rotate_270(rotated_horizontal_reverted_pieces)
 
     return horizontal_reverted_pieces
 
 def diagonal_search(mover_pieces, opponent_pieces, selected_move):
+
+    #Search for pieces to be reverted along the diagonals
 
     reverted_pieces = []
 

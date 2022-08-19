@@ -1,3 +1,8 @@
+'''
+This module contains methods to manipulate a bitboard and transform it into one
+of the 8 possible symmetric positions
+'''
+
 from enum import Enum
 import random
 

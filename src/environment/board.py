@@ -1,3 +1,7 @@
+'''
+The class Board manages the board of the game: pieces, legal moves, move execution
+'''
+
 import numpy as np
 
 from src.environment.config import *
@@ -14,6 +18,8 @@ class Board:
         self.black_pieces = black_pieces
         self.turn = turn
 
+        #Set to True to rearrange the next position (after a move is played)
+        #into one of its possible 8 symmetries
         self.create_random_symmetry = create_random_symmetry
 
         if self.white_pieces is None or self.black_pieces is None or self.turn is None:
@@ -29,12 +35,16 @@ class Board:
 
     def apply_symmetry(self, symmetry):
 
+        #Return a new board with the given symmetry
+
         white_pieces = BoardSymmetry.symmetric(self.white_pieces, symmetry)
         black_pieces = BoardSymmetry.symmetric(self.black_pieces, symmetry)
 
         return Board(white_pieces, black_pieces, self.turn, self.create_random_symmetry)
 
     def reset(self):
+
+        #Create starting position
 
         if START_EMPTY_BOARD:
             self.white_pieces = bitboard_handler.empty_bitboard()
@@ -47,6 +57,9 @@ class Board:
 
     def check_pass_or_terminate(self):
 
+        #Pass the move if there are no legal moves
+        #End the game if there are still no legal moves after passing
+
         if len(self.legal_moves["indices"])==0:
             self.turn = not self.turn
             self.legal_moves = self.generate_legal_moves()
@@ -58,11 +71,15 @@ class Board:
 
     def generate_empty_squares(self):
 
+        #Crate a bitboard representation for the empty squares
+
         occupied_squares = bitboard_handler.bitwise([self.white_pieces, self.black_pieces],"or",True)
 
         return bitboard_handler.negate(occupied_squares)
 
     def generate_legal_moves(self):
+
+        #Compute possible legal moves and save in different formats
 
         mover_pieces = self.white_pieces if self.turn else self.black_pieces
         opponent_pieces = self.black_pieces if self.turn else self.white_pieces
@@ -84,6 +101,9 @@ class Board:
 
     def generate_reward(self):
 
+        #Check if game has ended and give a reward
+
+        #No reward if the games has not reached the end
         if not self.is_terminal:
             return None
 
@@ -91,16 +111,21 @@ class Board:
             white_count = bitboard_handler.count_ones(self.white_pieces)
             black_count = bitboard_handler.count_ones(self.black_pieces)
 
+            #Reward = 0 for a draw
             if white_count==black_count:
                 return 0
 
+            #Reward = 1 if white wins
             elif white_count>black_count:
                 return 1
 
+            #Reward = -1 if black wins
             else:
                 return -1
 
     def get_state(self, legal_moves_format="array"):
+
+        #Return the current state: pieces, turn, legal moves
 
         if not legal_moves_format in ["array", "matrix", "bitboard", "indices"]:
             raise "Invalid legal moves format: {}".format(legal_moves_format)
@@ -114,6 +139,9 @@ class Board:
 
     def move(self, move_number):
 
+        #Play the given move
+
+        #Check if it's legal
         if move_number not in self.legal_moves["indices"]:
             raise "Invalid move!"
 
@@ -134,7 +162,7 @@ class Board:
             mover_pieces, random_operation = BoardSymmetry.random_symmetry(mover_pieces)
             opponent_pieces = BoardSymmetry.symmetric(opponent_pieces, BoardSymmetry.Operation(random_operation))
 
-        #Create and return new state
+        #Create and return updated position
         if self.turn:
             white_pieces = mover_pieces
             black_pieces = opponent_pieces

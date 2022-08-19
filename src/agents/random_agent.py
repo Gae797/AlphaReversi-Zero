@@ -1,3 +1,8 @@
+'''
+The random agent is the most basic one and it chooses a random move between the
+legal ones
+'''
+
 from src.agents.agent_interface import AgentInterface
 
 import random
@@ -12,6 +17,8 @@ class RandomAgent(AgentInterface):
             random.seed(seed)
 
     def play(self, board):
+
+        #Pick a random move
 
         legal_moves = board.legal_moves["indices"]
         move = random.choice(legal_moves)

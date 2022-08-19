@@ -1,3 +1,8 @@
+'''
+This agent uses the external engine "Edax", considered the current best "classical"
+engine at Reversi
+'''
+
 import time
 import platform
 from subprocess import Popen, PIPE
@@ -26,14 +31,17 @@ class EdaxAgent(AgentInterface):
 
     def play(self, board):
 
+        #Ask Edax to play
         self.engine.stdin.write("go\n")
         self.engine.stdin.flush()
 
+        #Wait for Edax's answer
         if self.depth<20:
             time.sleep(1)
         else:
             time.sleep(3)
 
+        #Read answer
         self.stdout.seek(0)
         lines = self.stdout.readlines()
         last_line = lines[-2]
@@ -49,6 +57,8 @@ class EdaxAgent(AgentInterface):
 
     def start_new_game(self):
 
+        #Start Edax and open stdin and stdout channels
+
         self.stdout = TemporaryFile()
 
         init_params = [EDAX_ENGINE_PATH,
@@ -63,6 +73,8 @@ class EdaxAgent(AgentInterface):
 
     def close_game(self):
 
+        #Close Edax and all the communication channels
+
         self.engine.stdin.write("q")
         self.engine.stdin.flush()
         self.engine.terminate()
@@ -74,6 +86,8 @@ class EdaxAgent(AgentInterface):
 
     def update_position(self, played_move):
 
+        #Send played move to Edax
+
         coordinate = coordinate_handler.move_to_coordinate(played_move)
 
         self.engine.stdin.write(coordinate+"\n")
@@ -82,11 +96,15 @@ class EdaxAgent(AgentInterface):
 
     def force_pass(self):
 
+        #Tell Edax that a forced pass move has been executed
+
         self.engine.stdin.write("ps\n")
         self.engine.stdin.flush()
         time.sleep(0.1)
 
     def force_sequence(self, sequence):
+
+        #Tell Edax to play a sequence of moves
 
         for coordinate in sequence:
             self.engine.stdin.write(coordinate+"\n")

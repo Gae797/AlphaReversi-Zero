@@ -1,3 +1,7 @@
+'''
+Main agent based on AlphaReversi trained network
+'''
+
 import numpy as np
 
 from src.agents.agent_interface import AgentInterface
@@ -22,15 +26,18 @@ class AlphaReversiAgent(AgentInterface):
 
     def play(self, board):
 
+        #Run Monte Carlo Tree Search witht the specified number of iterations
         root = Node(board)
         mcts = MonteCarloTS(root, None, None, self.depth, None, self.model)
         mcts.run_search()
 
+        #Choose action with highest visit count
         visits = [child.visit_count for child in root.children]
         action = np.argmax(visits)
 
         move = board.legal_moves["indices"][action]
 
+        #Update evaluation node drop
         if self.evaluator is not None:
             network_move_eval = root.children[action].average_outcome
             engine_move_eval = root.average_outcome

@@ -1,8 +1,12 @@
+'''
+This class creates and updates the window to handle the GUI
+'''
+
 import tkinter as tk
 from PIL import Image, ImageDraw, ImageTk
 
 from src.environment.board import Board
-from src.gui.ui import UI, SIDE
+from src.environment.gui.ui import UI, SIDE
 
 class Window:
 

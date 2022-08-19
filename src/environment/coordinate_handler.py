@@ -1,3 +1,7 @@
+'''
+This is a group of functions to convert moves (numbers) into coordinates and viceversa
+'''
+
 coordinate_translation_dict = {
 "a":0,
 "b":1,

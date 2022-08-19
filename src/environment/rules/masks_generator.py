@@ -1,3 +1,8 @@
+'''
+MasksGenerator takes care of building bitboards the represent all the possible
+diagonals in the board
+'''
+
 import src.environment.bitboard as bitboard_handler
 
 from src.environment.config import *

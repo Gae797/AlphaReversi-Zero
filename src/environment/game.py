@@ -1,9 +1,14 @@
+'''
+The Game class handles the environment and the agents to play a game between
+two given agents
+'''
+
 import random
 
 from src.agents.agent_interface import AgentInterface
 from src.environment import coordinate_handler
 from src.environment.board import Board
-from src.gui.window import Window
+from src.environment.gui.window import Window
 
 from src.environment.config import *
 
@@ -18,6 +23,7 @@ class Game:
         self.show_names = show_names
         self.start_from_random_position = start_from_random_position
 
+        #Create starting position
         self.current_board = Board()
 
         if use_gui:
@@ -41,16 +47,19 @@ class Game:
 
     def play_move(self):
 
+        #Define playing agent
         turn = self.current_board.turn
         playing_agent = self.white_agent if turn else self.black_agent
         opponent_agent = self.white_agent if not turn else self.black_agent
 
+        #Ask playing agent to play a move
         move_number = playing_agent.play(self.current_board)
         self.current_board = self.current_board.move(move_number)
 
         if self.use_gui:
             self.game_window.update(self.current_board)
 
+        #Update external agents (Edax) current positions
         if opponent_agent.is_external_engine:
             opponent_agent.update_position(move_number)
             if turn==self.current_board.turn:
@@ -118,6 +127,8 @@ class Game:
             self.game_window.update(self.current_board)
 
     def get_random_position(self):
+
+        #Read a sequence of moves from the official XOT file to start from a random position
 
         with open(XOT_PATH, "r") as opening_file:
             lines = opening_file.readlines()

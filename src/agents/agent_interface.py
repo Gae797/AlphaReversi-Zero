@@ -1,3 +1,7 @@
+'''
+This module contains an interface for all the agents to play
+'''
+
 from abc import ABC, abstractmethod
 
 class AgentInterface(ABC):

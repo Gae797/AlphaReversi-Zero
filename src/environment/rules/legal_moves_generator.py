@@ -1,3 +1,8 @@
+'''
+This module is responsible for generating all the possible legal moves from a
+given board
+'''
+
 import src.environment.bitboard as bitboard_handler
 
 from src.environment.config import *
@@ -17,9 +22,12 @@ def general_search(mover_pieces, opponent_pieces, empty_squares, step):
 
     legal_moves = bitboard_handler.empty_bitboard()
 
+    #Shift the mocing pieces toward the given direction and intersect with opponent pieces
     shifted_pieces = bitboard_handler.shift(mover_pieces, step)
     valid_moves = bitboard_handler.bitwise([shifted_pieces, opponent_pieces], "and")
 
+    #Add a legal move for all the shifted moving pieces that meet an empty square
+    #after an opponent piece in the search direction
     for i in range(BOARD_SIZE-2):
         shifted_pieces = bitboard_handler.shift(valid_moves, step)
 
@@ -32,11 +40,13 @@ def general_search(mover_pieces, opponent_pieces, empty_squares, step):
 
 def general_diagonal_search(mover_pieces, opponent_pieces, empty_squares, diagonal_mask, up, right):
 
+    #Define diagonal direction
     vertical_step = BOARD_SIZE if up else -BOARD_SIZE
     horizontal_step = 1 if right else -1
 
     step = vertical_step + horizontal_step
 
+    #Mask all the pieces and empty squares along the requested diagonal
     masked_mover_pieces = bitboard_handler.bitwise([mover_pieces, diagonal_mask], "and")
     masked_opponent_pieces = bitboard_handler.bitwise([opponent_pieces, diagonal_mask], "and")
     masked_empty_squares = bitboard_handler.bitwise([empty_squares, diagonal_mask], "and")
@@ -44,6 +54,8 @@ def general_diagonal_search(mover_pieces, opponent_pieces, empty_squares, diagon
     return general_search(masked_mover_pieces, masked_opponent_pieces, masked_empty_squares, step)
 
 def vertical_search(mover_pieces, opponent_pieces, empty_squares):
+
+    #Search for vertical legal moves (up and down) in parallel
 
     up_legal_moves = general_search(mover_pieces, opponent_pieces, empty_squares, BOARD_SIZE)
     down_legal_moves = general_search(mover_pieces, opponent_pieces, empty_squares, -BOARD_SIZE)
@@ -54,6 +66,8 @@ def vertical_search(mover_pieces, opponent_pieces, empty_squares):
 
 def horizontal_search(mover_pieces, opponent_pieces, empty_squares):
 
+    #Rotate bitboards 90 degrees to run a (faster) vertical search
+
     rotated_mover_pieces = bitboard_handler.rotate_90(mover_pieces)
     rotated_opponent_pieces = bitboard_handler.rotate_90(opponent_pieces)
     rotated_empty_squares = bitboard_handler.rotate_90(empty_squares)
@@ -63,11 +77,14 @@ def horizontal_search(mover_pieces, opponent_pieces, empty_squares):
 
     rotated_horizontal_legal_moves = bitboard_handler.bitwise([right_legal_moves, left_legal_moves], "or")
 
+    #Anti-rotate 90 degree to recover the correct orientation
     horizontal_legal_moves = bitboard_handler.rotate_270(rotated_horizontal_legal_moves)
 
     return horizontal_legal_moves
 
 def diagonal_search(mover_pieces, opponent_pieces, empty_squares):
+
+    #Generate legal moves along all the diagonals
 
     legal_moves = []
 
