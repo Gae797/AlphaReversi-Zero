@@ -1,3 +1,7 @@
+'''
+This class is used to decrease the learning rate accordingly to the current generation
+'''
+
 import tensorflow as tf
 
 class LRSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):

@@ -1,3 +1,9 @@
+'''
+The training queue receives the training data (encountered positions, outcomes,
+search policies) and then it train the network, at the end of each generation,
+sampling through the Generator
+'''
+
 import numpy as np
 import random
 from collections import deque

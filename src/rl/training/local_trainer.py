@@ -1,3 +1,7 @@
+'''
+The current module is responsible for managing the entire training process
+'''
+
 from multiprocessing import Process, Queue, Manager
 from collections import deque
 import tensorflow as tf
@@ -41,6 +45,8 @@ class Trainer:
 
     def init_socket(self):
 
+        #Create a connection with the client
+
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.bind((HOST, PORT))
 
@@ -56,9 +62,11 @@ class Trainer:
         while(self.completed_generations != GOAL_GENERATION):
             start_time = time.time()
 
+            #Play new games
             self.run_selfplay_session()
             print("Self play session completed")
 
+            #Train and save a checkpoint
             self.run_training_session()
             self.completed_generations += 1
             lr_schedule.set_generation(self.completed_generations)
@@ -74,6 +82,7 @@ class Trainer:
 
     def run_selfplay_session(self):
 
+        #Divide games to be played between server and client if a remote trainer is also used
         if USE_REMOTE:
             games_per_worker = N_GAMES_BEFORE_TRAINING // (LOCAL_WORKERS + REMOTE_WORKERS)
             n_local_games = (games_per_worker-2) * LOCAL_WORKERS
@@ -84,10 +93,12 @@ class Trainer:
         else:
             n_local_games = N_GAMES_BEFORE_TRAINING
 
+        #Define number of MCTS iterations depending on the current generation
         for step in MCTS_ITERATIONS:
             if self.completed_generations >= step:
                 depth = MCTS_ITERATIONS[step]
 
+        #Run a selfplay process for each of the workers
         threads = [SelfPlayThread(self.prediction_queue.queue,
                                 self.prediction_queue.workers,
                                 self.training_queue.buffer,
@@ -105,6 +116,7 @@ class Trainer:
         for thread in threads:
             thread.process.join()
 
+        #Wait for client (if a remote trainer is used) to finish its games
         if USE_REMOTE:
             self.receive_buffer()
 
@@ -113,6 +125,8 @@ class Trainer:
         self.training_queue.train()
 
     def load_last_generation(self):
+
+        #Check folders to retrieve the number of completed generations
 
         dirs = os.listdir(WEIGHTS_PATH)
         if len(dirs)==0:
@@ -123,6 +137,8 @@ class Trainer:
             return max(gens)
 
     def save_checkpoint(self):
+
+        #Save model's weights and played positions in the training window
 
         path = os.path.join(WEIGHTS_PATH, "Generation {}".format(self.completed_generations))
 
@@ -143,11 +159,13 @@ class Trainer:
         lr_schedule.set_generation(completed_generations)
         model = network.build_model(BOARD_SIZE, N_RESIDUAL_BLOCKS)
 
+        #Create new model and new training queue if it is the first generation
         if completed_generations==0:
             train_deque = deque(maxlen=TRAINING_QUEUE_LEN)
 
             print("Created new model for training")
 
+        #Load model's weights and played positions in the training window
         else:
             path = os.path.join(WEIGHTS_PATH, "Generation {}".format(completed_generations))
             model.load_weights(os.path.join(path, "variables"))
@@ -161,6 +179,8 @@ class Trainer:
 
     def send_data(self, n_required_games):
 
+        #Send model's weights, current generation number and number of games to play to client
+
         weights = self.model.get_weights()
         n_completed_generations = self.completed_generations
 
@@ -173,6 +193,8 @@ class Trainer:
         print("Data sent")
 
     def receive_buffer(self):
+
+        #Receive played positions from the client
 
         buffer_size = self.conn.recv(4)
         buffer_size = int.from_bytes(buffer_size,"big")
@@ -189,6 +211,8 @@ class Trainer:
         self.send_remote_games_to_trainer_queue(unpacked_buffer)
 
     def send_remote_games_to_trainer_queue(self, buffer):
+
+        #Unpack encountered nodes and send features and labels to the training queue
 
         samples = []
 

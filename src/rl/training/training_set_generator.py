@@ -1,3 +1,7 @@
+'''
+This class creates batches to train the network on
+'''
+
 import tensorflow as tf
 import numpy as np
 import random
@@ -9,6 +13,7 @@ class Generator(tf.keras.utils.Sequence):
 
         self.batch_size = batch_size
 
+        #Create the training set by sampling the requeste number of positions from the training queue
         set_size = min(training_positions, len(training_queue))
         dataset = random.sample(training_queue, k=set_size)
         self.dataset = np.array(dataset, dtype=object)
@@ -21,6 +26,8 @@ class Generator(tf.keras.utils.Sequence):
 
     def __getitem__(self, idx):
 
+        #Return next batch for training
+
         batch = self.dataset[idx * self.batch_size:(idx + 1) * self.batch_size]
 
         x, y = self.unpack_samples(batch)
@@ -32,6 +39,8 @@ class Generator(tf.keras.utils.Sequence):
         return math.ceil(len(self.dataset) / self.batch_size)
 
     def unpack_samples(self, samples):
+
+        #Extract features and labels from each sample of the training set
 
         x_train = []
         y_train = []

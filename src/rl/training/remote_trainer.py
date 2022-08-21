@@ -1,3 +1,8 @@
+'''
+This is the main module used by the client, for remote training.
+It is used to play games that will be sent to the server
+'''
+
 import pickle
 import socket
 from multiprocessing import Process, Queue, Manager
@@ -34,11 +39,15 @@ class RemoteTrainer:
 
     def init_socket(self):
 
+        #Create a connection with the server
+
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.settimeout(None)
         self.socket.connect((HOST, PORT))
 
     def run(self):
+
+        #Receive data, play games and send played positions
 
         while(self.completed_generations != GOAL_GENERATION):
             self.receive_data()
@@ -50,10 +59,12 @@ class RemoteTrainer:
 
     def run_selfplay_session(self):
 
+        #Define number of MCTS iterations depending on the current generation
         for step in MCTS_ITERATIONS:
             if self.completed_generations >= step:
                 depth = MCTS_ITERATIONS[step]
 
+        #Run a selfplay process for each of the workers
         threads = [SelfPlayThread(self.prediction_queue.queue,
                                 self.prediction_queue.workers,
                                 self.games_buffer,
@@ -69,10 +80,13 @@ class RemoteTrainer:
 
         self.prediction_queue.run_execution()
 
+        #Wait for all workers to finish
         for thread in threads:
             thread.process.join()
 
     def send_buffer(self):
+
+        #Send played positions to the server
 
         buffer = []
         buffer.extend(self.games_buffer)
@@ -89,6 +103,9 @@ class RemoteTrainer:
 
     def receive_data(self):
 
+        #Receive model's weights, completed generations number and number of games
+        #to played from the server
+
         data_size = self.socket.recv(4)
         data_size = int.from_bytes(data_size,"big")
 
@@ -99,6 +116,7 @@ class RemoteTrainer:
 
         print("Data received")
 
+        #Set the correspondent variables with the received data
         unpacked_data = pickle.loads(data)
         weights = unpacked_data[0]
         self.completed_generations = unpacked_data[1]
