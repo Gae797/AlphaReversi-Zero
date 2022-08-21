@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import multiprocessing
 
 from src.rl.mcts.node import Node
@@ -74,9 +75,9 @@ class MonteCarloTS():
 
         select_policy = []
         for child_node, prior_prob in zip(actions, probabilities):
-            uct = CPUCT * prior_prob * parent_node.visit_count / (child_node.visit_count+1)
+            ucb = CPUCT * prior_prob * (math.sqrt(parent_node.visit_count) / (child_node.visit_count+1))
             node_value = child_node.average_outcome if parent_node.board.turn else -child_node.average_outcome
-            select_policy.append(uct + node_value)
+            select_policy.append(ucb + node_value)
 
         return select_policy
 

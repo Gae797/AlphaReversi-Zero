@@ -1,3 +1,7 @@
+'''
+Match class is used to start a match of specified length against two agents
+'''
+
 from src.agents.agent_interface import AgentInterface
 from src.environment.game import Game
 
