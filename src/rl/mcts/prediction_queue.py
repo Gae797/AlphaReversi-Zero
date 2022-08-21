@@ -1,3 +1,8 @@
+'''
+The prediction queue is used to estimate policies and values from multiple different
+nodes (boards) at once, reducing the number of calls to the GPU and saving training time
+'''
+
 from multiprocessing import Queue
 import numpy as np
 import tensorflow as tf
@@ -18,13 +23,13 @@ class PredictionQueue:
         self.workers = workers_queue
         self.max_await = max_await
 
-        #self.model = model
-        self.model_graph = tf.function(lambda x: model(x))
+        self.model_graph = tf.function(lambda x: model(x)) #Execute network in fast graph mode
 
         self.prediction_dict = prediction_dict
 
     @property
     def passed_time(self):
+        #Define how much time has passed from the last prediction
         return time.time()-self.timer
 
     def run_execution(self):
@@ -34,6 +39,7 @@ class PredictionQueue:
         n_workers = self.workers.qsize()
 
         while(n_workers>0 or jobs_done==0):
+            #Empty the queue and collect nodes
             if not self.queue.empty():
                 pack = self.queue.get()
                 self.collected_nodes.append(pack)
@@ -41,6 +47,8 @@ class PredictionQueue:
             n_workers = self.workers.qsize()
             size = len(self.collected_nodes)
 
+            #Evaluate collected nodes if they are at least half of the workers
+            #or if it has passed too much time from the last prediction
             if size>0 and (size>=n_workers//2 or self.passed_time>self.max_await):
                 self.evaluate_nodes()
                 self.timer = time.time()
@@ -66,6 +74,7 @@ class PredictionQueue:
         with tf.device('/device:GPU:0'):
             policies, values = self.model_graph([board_inputs_batched, legal_moves_batched])
 
+        #Send predictions to respective workers
         for i, pack in enumerate(self.collected_nodes):
             thread_number = pack[1]
             prediction = [np.array(policies[i]), np.array(values[i])]

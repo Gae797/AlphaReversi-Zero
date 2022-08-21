@@ -1,3 +1,7 @@
+'''
+This module is responsible for creating and compiling the network
+'''
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers, metrics

@@ -1,3 +1,7 @@
+'''
+This module manages the algorithm behind the Monte Carlo Tree Search
+'''
+
 import numpy as np
 import math
 import multiprocessing
@@ -31,10 +35,14 @@ class MonteCarloTS():
 
     def run_search(self):
 
+        #Run the MCTS for the specified number of iterations
+
         for i in range(self.n_iterations):
             self.run_iteration()
 
     def run_iteration(self):
+
+        #3 steps: select node (leaf), evaluate and backup
 
         selected_node = self.select(self.root)
 
@@ -45,16 +53,20 @@ class MonteCarloTS():
 
     def add_dirichlet_noise(self, node):
 
+        #Choose alpha
         n_actions = len(node.children)
         alpha = min(1, 10.0/n_actions)
         alpha_vector = [alpha] * n_actions
 
+        #Sample from dirichlet distribution
         dirichlet_noise = np.random.dirichlet(alpha_vector)
 
+        #Apply noise with epsilon weight
         node.estimated_policy = (1-EPS_DIRICHLET)*node.estimated_policy + EPS_DIRICHLET*dirichlet_noise
 
     def select(self, node):
 
+        #Return node if it is a leaf
         if node.board.is_terminal or node.is_leaf():
             return node
 
@@ -62,6 +74,7 @@ class MonteCarloTS():
             if not node.is_expanded():
                 node.expand()
 
+            #Compute tree policy (UCB)
             select_policy = self.select_policy(node)
             selected_action = np.argmax(select_policy)
             selected_node = node.children[selected_action]
@@ -73,6 +86,7 @@ class MonteCarloTS():
         probabilities = parent_node.estimated_policy
         actions = parent_node.children
 
+        #Compute UCB for each action
         select_policy = []
         for child_node, prior_prob in zip(actions, probabilities):
             ucb = CPUCT * prior_prob * (math.sqrt(parent_node.visit_count) / (child_node.visit_count+1))
@@ -83,13 +97,17 @@ class MonteCarloTS():
 
     def evaluate(self, node):
 
+        #Ask prediction queue to evaluate if no local model is given (training)
         if self.local_model is None:
+            #Send request to prediction queue
             pack = (node.board, self.thread_number)
             self.prediction_queue.put(pack)
 
+            #Get answer from prediction queue
             prediction = self.prediction_dict[self.thread_number].get()
             node.set_estimation(prediction)
 
+        #Do a local prediction if a local model is given (real game)
         else:
             white_pieces, black_pieces, turn, legal_moves, reward = node.board.get_state()
 

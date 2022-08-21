@@ -1,3 +1,7 @@
+'''
+This class is the value head described in the AlphaGo Zero paper
+'''
+
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers

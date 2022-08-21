@@ -1,3 +1,7 @@
+'''
+This class is used to represent a node in the Monte Carlo Tree Search
+'''
+
 import numpy as np
 
 from src.environment.board import Board
@@ -22,6 +26,8 @@ class Node:
 
     def set_estimation(self, prediction):
 
+        #Set the policy and the value estimated by the neural network
+
         global_policy = prediction[0]
         self.estimated_policy = global_policy[self.board.legal_moves["indices"]]
 
@@ -30,6 +36,8 @@ class Node:
         self.estimated_value = prediction[1][0]
 
     def expand(self):
+
+        #Add a child node for all the possible actions (legal moves)
 
         self.children = []
 
@@ -41,6 +49,8 @@ class Node:
             self.children.append(child)
 
     def backup_update(self, value):
+
+        #Update the current node outcome and backup to parent nodes
 
         self.visit_count += 1
         self.total_outcome += value
